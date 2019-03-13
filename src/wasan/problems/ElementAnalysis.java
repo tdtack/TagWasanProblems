@@ -4,42 +4,42 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * 和算図形問題に含まれる幾何要素(点・線分・円)および図形要素(n角形・円)の認識に関するクラスである。
+ * 和算図形問題に含まれる幾何要素(点・線分・円)、図形要素(n角形・円)の認識に関するクラスです。
  * 
  * @author Takuma Tsuchihashi
  *
  */
 public class ElementAnalysis {
 
-	/** ElementAnalysisクラス内でHough変換を利用する。 */
+	/** このクラスでHoughTransformクラスを利用する際に使います。 */
 	private HoughTransform houghTrans;
 
 	/**
-	 * 以下、図形問題から仮抽出された幾何要素を保持するリスト
+	 * 以下、図形問題から仮抽出された幾何要素(点・線分・円)を保持するリストです。
 	 */
-	/** 図形問題から仮抽出された点を保持する。 */
+	/** 図形問題から仮抽出された点を保持します。 */
 	public ArrayList<MyPoint> scannedPoint = new ArrayList<MyPoint>();
-	/** 図形問題から仮抽出された線分を保持する。 */
+	/** 図形問題から仮抽出された線分を保持します。 */
 	public ArrayList<MyLine> scannedLine = new ArrayList<MyLine>();
-	/** 図形問題から抽出された円を保持する。 */
+	/** 図形問題から抽出された円を保持します。 */
 	public ArrayList<MyCircle> scannedCircle = new ArrayList<MyCircle>();
 
 	/**
-	 * 以下、仮抽出の要素を補正・確定した幾何要素・図形要素を保持するリスト
+	 * 以下、仮抽出の要素を補正し、確定した幾何要素(点・線分)と図形要素(n角形・円)を保持するリストです。
 	 */
-	/** 仮抽出のものを補正・確定した点を保持するリスト */
+	/** 仮抽出の点を補正し、確定した点を保持します。 */
 	public ArrayList<MyPoint> detectedPoint = new ArrayList<MyPoint>();
-	/** 仮抽出のものを補正・確定した線分を保持するリスト */
+	/** 仮抽出の線分を補正し、確定した線分を保持します。 */
 	public ArrayList<MyLine> detectedLine = new ArrayList<MyLine>();
-	/** 仮抽出のものを補正・確定した円を保持するリスト */
+	/** 仮抽出の円を補正し、確定した円を保持します。 */
 	public ArrayList<MyCircle> detectedCircle = new ArrayList<MyCircle>();
-	/** 確定した点と線分から抽出されたn角形を保持するリスト */
+	/** 確定した点と線分から抽出されたn角形を保持します。 */
 	public ArrayList<MyPolygon> detectedPolygon = new ArrayList<MyPolygon>();
 
 	/**
-	 * コンストラクタ
+	 * ElementAnalysisオブジェクトを作成します。
 	 * 
-	 * @param _hough
+	 * @param houghTrans
 	 */
 	public ElementAnalysis(HoughTransform _houghTrans) {
 		this.houghTrans = _houghTrans;
@@ -57,11 +57,6 @@ public class ElementAnalysis {
 		this.detectedCircle.clear();
 		this.detectedPolygon.clear();
 	}
-
-	// Hough変換による点の検出は難しい
-	// 和算における点は、線分の端点であることがほとんどである。
-	// そこで、補正の意味も込めて(線分×線分)、(線分×円)、線分の端点を全て計算し、
-	// 必要に応じて補正し、検出としている
 
 	public void scanPoint() {// 検出した線分と円から交点を総当たりで検出
 		for (int i = 0; i < this.scannedLine.size(); i++) {// 線分同士の交点の検出
@@ -106,9 +101,8 @@ public class ElementAnalysis {
 		}
 
 		// 被りがある点の排除
-		for (int i = 0; i < this.scannedPoint.size(); i++) {// for (int i = this.scannedPoint.size() - 1; i >= 0; i--) {
+		for (int i = 0; i < this.scannedPoint.size(); i++) {
 			this.scannedPoint = organizePoint(i, i + 1);// 重複をなくす
-			// this.scannedPoint = organizePoint(i, i - 1);
 		}
 	}
 
@@ -117,7 +111,7 @@ public class ElementAnalysis {
 			MyPoint p1 = this.scannedPoint.get(i);
 			MyPoint p2 = this.scannedPoint.get(index1);
 
-			if (p1.calcDistToPoint(p2) < 20) {// ☆☆☆threshold//決定
+			if (p1.calcDistToPoint(p2) < 20) {
 				for (int j = 0; j < this.scannedLine.size(); j++) {
 					MyLine l = this.scannedLine.get(j);
 					if (l.start == p1) {
@@ -152,8 +146,10 @@ public class ElementAnalysis {
 	}
 
 	private ArrayList<MyLine> organizeLine() {
-		for (int i = 0; i < this.scannedLine.size(); i++) {// 線分上の点に近い場合は置き換え
+		for (int i = 0; i < this.scannedLine.size(); i++) {
 			MyLine l1 = this.scannedLine.get(i);
+			
+			// 線分上の点に近い場合は置き換え
 			for (int j = i + 1; j < this.scannedLine.size(); j++) {
 				MyLine l2 = this.scannedLine.get(j);
 
@@ -266,7 +262,7 @@ public class ElementAnalysis {
 
 				for (int j = 0; j < this.scannedPoint.size(); j++) {// 引き寄せられる感じ
 					MyPoint p = this.scannedPoint.get(j);
-					if (p.calcDistToLine(l) < 10) {// ☆☆☆threshold/15
+					if (p.calcDistToLine(l) < 10) {
 						if (p != l.start && p.calcDistToPoint(l.start) < minDist[0]) {
 							minDist[0] = p.calcDistToPoint(l.start);
 							pointArray[0] = p;
@@ -318,7 +314,7 @@ public class ElementAnalysis {
 
 				for (int j = 0; j < this.scannedLine.size(); j++) {// 引き寄せる感じ
 					MyLine l2 = this.scannedLine.get(j);
-					if ((l1 != l2) && pointArray[0].calcDistToLine(l2) < 10) {// ☆☆☆threshold
+					if ((l1 != l2) && pointArray[0].calcDistToLine(l2) < 10) {
 						double dist1 = pointArray[0].calcDistToPoint(l2.start);
 						double dist2 = pointArray[0].calcDistToPoint(l2.end);
 						if (dist1 < dist2) {
@@ -338,7 +334,7 @@ public class ElementAnalysis {
 
 					for (int j = 0; j < this.scannedPoint.size(); j++) {// 引き寄せられる感じ
 						MyPoint p2 = this.scannedPoint.get(j);
-						if (p2.calcDistToLine(l1) < 10) {// ☆☆☆threshold/15
+						if (p2.calcDistToLine(l1) < 10) {
 							if (p2 != pointArray[0] && p2.calcDistToPoint(pointArray[0]) < minDist) {
 								minDist = p2.calcDistToPoint(pointArray[0]);
 								p1 = p2;
@@ -364,7 +360,7 @@ public class ElementAnalysis {
 			MyPoint p = this.scannedPoint.get(i);
 
 			int relatedTotal = p.relatedPoint.size() + p.relatedLine.size() + p.relatedCircle.size();
-			if (relatedTotal <= 2 && !isEndPoint(p)) {// relatedTotal == 2 && !isEndPoint(p)
+			if (relatedTotal <= 2 && !isEndPoint(p)) {
 				this.scannedPoint.remove(p);
 			}
 		}
@@ -509,7 +505,7 @@ public class ElementAnalysis {
 				}
 				index++;
 
-				return;// a終了する
+				return;
 			}
 			for (int i = start; i < pointList.size() - r.length + plus; i++) {
 				r[plus - 1] = i;

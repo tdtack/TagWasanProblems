@@ -8,101 +8,104 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /**
- * 和算図形問題への自動タグ付けおよびベクトル作成に関するクラスである。
+ * 和算図形問題への自動タグ付け、ベクトル作成に関するクラスです。
  * 
  * @author Takuma Tsuchihashi
  *
  */
 public class AutomaticTag {
 
-	/** AutomaticTagクラス内で画像処理を利用する。 */
+	/** このクラスでImageProcessingクラスを利用する際に使います。 */
 	private ImageProcessing imgProc;
 
-	/** AutomaticTagクラス内で画像処理を利用する。 */
+	/** このクラスでElementAnalysisクラスを利用する際に使います。 */
 	private ElementAnalysis elemAnal;
 
-	/** AutomaticTagクラス内で文字認識を利用する。 */
+	/** このクラスでCharacterRecognitionクラスを利用する際に使います。 */
 	private CharacterRecognition charRec;
 
 	/**
-	 * 以下、幾何要素(点、線分、円)のタグを表す変数(円のみ図形要素のタグとしても扱う。)
+	 * 以下、幾何要素(点・線分・円)のタグを表す変数です。(円のみ、図形要素のタグとしても扱います。)
 	 */
-	/** 点のタグを表す。 */
+	/** 点のタグを表します。 */
 	private String pointTag = "点";
-	/** 線分のタグを表す。 */
+	/** 線分のタグを表します。 */
 	private String lineTag = "線分";
-	/** 円のタグを表す。 */
+	/** 円のタグを表します。 */
 	private String circleTag = "円";
 
 	/**
-	 * 以下、図形要素(n角形)のタグを表す変数
+	 * 以下、図形要素(n角形)のタグを表す変数です。(円のみ、幾何要素のタグを利用します。)
 	 */
-	/** n角形のタグを表す。(三角形、四角形、五角形、六角形) */
+	/** n角形のタグを表します。(三角形・四角形・五角形・六角形) */
 	private String[] polygonTag = { "三角形", "四角形", "五角形", "六角形" };
-	/** 特徴的な三角形のタグを表す。(三角形、正三角形、二等辺三角形、直角三角形) */
+	/** 特徴的な三角形のタグを表します。(三角形・正三角形・二等辺三角形・直角三角形) */
 	private String[] triangleTag = { polygonTag[0], "正三角形", "二等辺三角形", "直角三角形" };
-	/** 特徴的な四角形のタグを表す。(四角形、正方形、長方形、菱形、等脚台形) */
+	/** 特徴的な四角形のタグを表します。(四角形・正方形・長方形・菱形・等脚台形) */
 	private String[] quadrangleTag = { polygonTag[1], "正方形", "長方形", "菱形", "等脚台形" };
-	/** 特徴的な五角形のタグを表す。(五角形、正五角形) */
+	/** 特徴的な五角形のタグを表します。(五角形・正五角形) */
 	private String[] pentagonTag = { polygonTag[2], "正五角形" };
-	/** 特徴的な六角形のタグを表す。(六角形、正六角形) */
+	/** 特徴的な六角形のタグを表します。(六角形・正六角形) */
 	private String[] hexagonTag = { polygonTag[3], "正六角形" };
 
 	/**
-	 * 以下、図形要素(n角形)のタグ合計を保持する配列
+	 * 以下、図形要素(n角形)のタグ合計を保持する配列です。
 	 */
-	/** 特徴的な三角形のタグ合計を保持する。(三角形、正三角形、二等辺三角形、直角三角形) */
+	/** 特徴的な三角形のタグ合計を保持します。(三角形・正三角形・二等辺三角形・直角三角形) */
 	private int[] triangleNum = new int[triangleTag.length];
-	/** 特徴的な四角形のタグ合計を保持する。(四角形、正方形、長方形、菱形、等脚台形) */
+	/** 特徴的な四角形のタグ合計を保持します。(四角形・正方形・長方形・菱形・等脚台形) */
 	private int[] quadrangleNum = new int[quadrangleTag.length];
-	/** 特徴的な五角形のタグ合計を保持する。(五角形、正五角形) */
+	/** 特徴的な五角形のタグ合計を保持します。(五角形・正五角形) */
 	private int[] pentagonNum = new int[pentagonTag.length];
-	/** 特徴的な六角形のタグ合計を保持する。(六角形、正六角形) */
+	/** 特徴的な六角形のタグ合計を保持します。(六角形・正六角形) */
 	private int[] hexagonNum = new int[hexagonTag.length];
 
 	/**
-	 * 以下、図形要素(n角形、円)同士の関係性のタグを表す配列(XとYを置き換えて利用する。)
+	 * 以下、図形要素(n角形・円)同士の関係性のタグを表す配列です。(XとYを置き換えて利用します。)
 	 */
-	/** 線分と円の関係性のタグを表す。(XとYが接する、XとYが1点で交わる、XとYが2点で交わる) */
+	/** 線分と円の関係性のタグを表します。(「XとYが接する」・「XとYが1点で交わる」・「XとYが2点で交わる」) */
 	private String[] relationLCTag = { "XとYが接する.", "XとYが1点で交わる.", "XとYが2点で交わる." };
-	/** n角形から見た円との関係性のタグを表す。(XがYに内接する、XがYの内部に存在する、XとYが互いに隣接する) */
+	/** n角形から見た円との関係性のタグを表します。(「XがYに内接する」・「XがYの内部に存在する」・「XとYが互いに隣接する」) */
 	private String[] relationPCTag = { "XがYに内接する.", "XがYの内部に存在する.", "XとYが互いに隣接する." };
-	/** 円から見たn角形との関係性のタグを表す。(XがYに内接する、XがYの内部に存在する、XとYが互いに重なり合う) */
+	/** 円から見たn角形との関係性のタグを表します。(「XがYに内接する」・「XがYの内部に存在する」・「XとYが互いに重なり合う」) */
 	private String[] relationCPTag = { "XがYに内接する.", "XがYの内部に存在する.", "XとYが互いに重なり合う." };
-	/** n角形同士の関係性のタグを表す。(XがYに内接する、XがYの内部に存在する、XとYが互いに隣接する、XとYが互いに重なり合う) */
+	/** n角形同士の関係性のタグを表します。(「XがYに内接する」・「XがYの内部に存在する」・「XとYが互いに隣接する」・「XとYが互いに重なり合う」) */
 	private String[] relationPPTag = { "XがYに内接する.", "XがYの内部に存在する.", "XとYが互いに隣接する.", "XとYが互いに重なり合う." };
-	/** 円同士の関係性のタグを表す。(XがYの内側で接する、XがYの内部に存在する、XとYが互いに外接する、XとYが互いに重なり合う) */
+	/** 円同士の関係性のタグを表します。(「XがYの内側で接する」・「XがYの内部に存在する」・「XとYが互いに外接する」・「XとYが互いに重なり合う」) */
 	private String[] relationCCTag = { "XがYの内側で接する.", "XがYの内部に存在する.", "XとYが互いに外接する.", "XとYが互いに重なり合う." };
 
 	/**
-	 * 以下、幾何要素(線分、円)同士・図形要素(n角形、円)同士の関係性のタグ合計を保持する配列
+	 * 以下、幾何要素(線分・円)同士、図形要素(n角形・円)同士の関係性のタグ合計を保持する配列です。
 	 */
-	/** 線分と円の関係性のタグ合計を保持する。(XとYが接する、XとYが1点で交わる、XとYが2点で交わる) */
+	/** 線分と円の関係性のタグ合計を保持します。(「XとYが接する」・「XとYが1点で交わる」・「XとYが2点で交わる」) */
 	private int[] relationLCNum = new int[relationLCTag.length];
-	/** n角形から見た円との関係性のタグ合計を保持する。(XがYに内接する、XがYの内部に存在する、XとYが隣接する) */
+	/** n角形から見た円との関係性のタグ合計を保持します。(「XがYに内接する」・「XがYの内部に存在する」・「XとYが隣接する」) */
 	private int[][] relationPCNum = new int[polygonTag.length][relationPCTag.length];
-	/** 円から見たn角形との関係性のタグ合計を保持する。(XがYに内接する、XがYの内部に存在する、XとYが重なり合う) */
+	/** 円から見たn角形との関係性のタグ合計を保持します。(「XがYに内接する」・「XがYの内部に存在する」・「XとYが重なり合う」) */
 	private int[][] relationCPNum = new int[polygonTag.length][relationCPTag.length];
-	/** n角形同士の関係性のタグ合計①を保持する。(XがYに内接する、XがYの内部に存在する) */
+	/** n角形同士の関係性のタグ合計①を保持します。(「XがYに内接する」・「XがYの内部に存在する」) */
 	private int[][] relationPPNum1 = new int[16][2];
-	/** n角形同士の関係性のタグ合計②を保持する。(XとYが隣接する、XとYが重なり合う) */
+	/** n角形同士の関係性のタグ合計②を保持します。(「XとYが隣接する」・「XとYが重なり合う」) */
 	private int[][] relationPPNum2 = new int[10][2];
-	/** 円同士の関係性のタグ合計①を保持する。(XがYの内側で接する、XがYの内部に存在する) */
+	/** 円同士の関係性のタグ合計①を保持します。(「XがYの内側で接する」・「XがYの内部に存在する」) */
 	private int[] relationCCNum1 = new int[2];
-	/** 円同士の関係性のタグ合計②を保持する。(XとYが外接する、XとYが重なり合う) */
+	/** 円同士の関係性のタグ合計②を保持します。(「XとYが外接する」・「XとYが重なり合う」) */
 	private int[] relationCCNum2 = new int[2];
 
 	/**
-	 * AutomaticTagオブジェクトを作成する。
+	 * AutomaticTagオブジェクトを作成します。
 	 * 
-	 * @param _imgProc  画像処理を利用する
-	 * @param _elemAnal 幾何要素(点・線分・円)および図形要素(n角形・円)の認識
+	 * @param _imgProc ImageProcessingクラス
+	 * @param _elemAnal ElementAnalysisクラス
 	 */
 	public AutomaticTag(ImageProcessing _imgProc, ElementAnalysis _elemAnal) {
 		this.imgProc = _imgProc;
 		this.elemAnal = _elemAnal;
 	}
-
+	
+	/**
+	 * 
+	 */
 	public void freeResource() {
 		this.imgProc = null;
 		this.elemAnal = null;
@@ -306,7 +309,7 @@ public class AutomaticTag {
 		}
 	}
 
-	private void printRelationPP() {// 分ける
+	private void printRelationPP() {
 		ArrayList<MyPoint> pointList = this.elemAnal.detectedPoint;
 		ArrayList<MyPolygon> polygonList = this.elemAnal.detectedPolygon;
 
@@ -487,7 +490,12 @@ public class AutomaticTag {
 
 		return pw;
 	}
-
+	
+	/**
+	 * 
+	 * @param pw
+	 * @return
+	 */
 	private PrintWriter writeElementNum(PrintWriter pw) {
 		pw.print(imgProc.imgName + ",");
 

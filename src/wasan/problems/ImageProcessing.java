@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 /**
- * 和算図形問題への自動タグ付けで活用する画像処理に関するクラスである。
+ * 和算図形問題への自動タグ付けで活用する画像処理に関するクラスです。
  * 
  * @author Takuma Tsuchihashi
  *
@@ -57,9 +57,9 @@ public class ImageProcessing {
 		originalImg = resizeImage(500);// 画像のリサイズ
 
 		// 画像の前処理
-		editingImg = preprocessImage(true);// 一応、手書きでかすれとかあるから、それを補完して検出しやすいものにする
+		editingImg = preprocessImage(true);// 補完して検出しやすいものにする
 		elementImg = preprocessImage(false);
-		characterImg = preprocessImage(false);// 膨張収縮で補間する効果はあるのかと期待できない(そのままの2値化とあまり変わらないのではないかと)
+		characterImg = preprocessImage(false);// 
 	}
 	
 	public void freeResource() {
@@ -111,7 +111,7 @@ public class ImageProcessing {
 		BufferedImage outputImg = originalImg;
 
 		outputImg = grayscaleImage(outputImg);// グレースケール化
-		outputImg = binarizeImage(outputImg);// 大津の方法で二値化したいところ → ヒストグラムは偏りがないから別にいい?
+		outputImg = binarizeImage(outputImg);
 		outputImg = (closing) ? closeImage(outputImg) : outputImg;// 膨張・収縮処理
 
 		return outputImg;
@@ -130,7 +130,7 @@ public class ImageProcessing {
 		return outputImg;
 	}
 
-	private BufferedImage binarizeImage(BufferedImage inputImg) {// 画像の二値化(大津の方法を使えないか?)
+	private BufferedImage binarizeImage(BufferedImage inputImg) {// 画像の二値化
 		BufferedImage outputImg = new BufferedImage(inputImg.getWidth(), inputImg.getHeight(),
 				BufferedImage.TYPE_BYTE_GRAY); // グレースケール化
 

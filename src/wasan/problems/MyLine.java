@@ -7,7 +7,7 @@ package wasan.problems;
 import java.util.ArrayList;
 
 /**
- * 和算図形問題に含まれる線分(幾何要素)に関するクラスである。
+ * 和算図形問題に含まれる線分(幾何要素)に関するクラスです。
  * 
  * @author Takuma Tsuchihashi
  *

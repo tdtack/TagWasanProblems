@@ -22,7 +22,7 @@ import org.tensorflow.Tensor;
 import org.tensorflow.types.UInt8;
 
 /**
- * 和算図形問題に含まれる文字要素の認識に関するクラスである。
+ * 和算図形問題に含まれる文字要素の認識に関するクラスです。
  * 
  * @author Takuma Tsuchihashi
  *

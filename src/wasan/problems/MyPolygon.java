@@ -3,7 +3,7 @@ package wasan.problems;
 import java.util.ArrayList;
 
 /**
- * 和算図形問題に含まれるn角形(図形要素)に関するクラスである。
+ * 和算図形問題に含まれるn角形(図形要素)に関するクラスです。
  * 
  * @author Takuma Tsuchihashi
  *

@@ -14,7 +14,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /**
- * 和算図形問題に含まれる幾何要素(線分・円)の認識で活用するHough変換に関するクラスである。
+ * 和算図形問題に含まれる幾何要素(線分・円)の認識で活用するHough変換に関するクラスです。
  * 
  * @author Kazushi Ahara, Takuma Tsuchihashi
  *
