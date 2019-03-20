@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 /**
  * 和算図形問題に含まれる幾何要素(点・線分・円)、図形要素(n角形・円)の認識に関するクラスです。
+ * 幾何要素はHoughTransformクラスを利用して抽出し、図形要素は抽出された幾何要素に基づいて分析されます。
  * 
  * @author Takuma Tsuchihashi
  *

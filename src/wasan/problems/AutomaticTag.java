@@ -8,61 +8,68 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /**
- * 和算図形問題への自動タグ付け、ベクトル作成に関するクラスです。
+ * 和算図形問題への自動タグ付け、特徴ベクトル生成に関するクラスです。
+ * ImageProcessingクラスやElementAnalysisクラスを利用し、図形問題から得られた情報に基づいてタグ付けを行います。
+ * また、図形問題に付与されたタグの合計から特徴ベクトルを生成します。
  * 
  * @author Takuma Tsuchihashi
  *
  */
 public class AutomaticTag {
 
-	/** このクラスでImageProcessingクラスを利用する際に使います。 */
+	/**
+	 * ImageProcessingクラスを利用するための変数です。
+	 * この変数を用いることでImageProcessingクラス内のメソッドなどを呼び出すことができます。
+	 */
 	private ImageProcessing imgProc;
 
-	/** このクラスでElementAnalysisクラスを利用する際に使います。 */
+	/**
+	 * ElementAnalysisクラスを利用するための変数です。
+	 * この変数を用いることでElementAnalysisクラス内のメソッドなどを呼び出すことができます。
+	 */
 	private ElementAnalysis elemAnal;
 
-	/** このクラスでCharacterRecognitionクラスを利用する際に使います。 */
+	/**
+	 * CharacterRecognitionクラスを利用するための変数です。
+	 * この変数を用いることでCharacterRecognitionクラス内のメソッドなどを呼び出すことができます。
+	 */
 	private CharacterRecognition charRec;
 
-	/**
-	 * 以下、幾何要素(点・線分・円)のタグを表す変数です。(円のみ、図形要素のタグとしても扱います。)
-	 */
-	/** 点のタグを表します。 */
+	// 以下、幾何要素のタグを表します。
+	
+	/** 幾何要素の「点」のタグを表します。 */
 	private String pointTag = "点";
-	/** 線分のタグを表します。 */
+	/** 幾何要素の「線分」のタグを表します。 */
 	private String lineTag = "線分";
-	/** 円のタグを表します。 */
+	/** 幾何要素の「円」のタグを表します。また、このタグは図形要素のタグとしても扱います。*/
 	private String circleTag = "円";
-
-	/**
-	 * 以下、図形要素(n角形)のタグを表す変数です。(円のみ、幾何要素のタグを利用します。)
-	 */
-	/** n角形のタグを表します。(三角形・四角形・五角形・六角形) */
+	
+	// 以下、図形要素(n角形のみ)のタグを表します。
+	
+	/** 図形要素の「n角形」のタグを表します。タグの内容は「三角形」「四角形」「五角形」「六角形」です。 */
 	private String[] polygonTag = { "三角形", "四角形", "五角形", "六角形" };
-	/** 特徴的な三角形のタグを表します。(三角形・正三角形・二等辺三角形・直角三角形) */
+	/** n角形のうち、特徴的な三角形のタグを表します。タグの内容は「三角形」「正三角形」「二等辺三角形」「直角三角形」です。 */
 	private String[] triangleTag = { polygonTag[0], "正三角形", "二等辺三角形", "直角三角形" };
-	/** 特徴的な四角形のタグを表します。(四角形・正方形・長方形・菱形・等脚台形) */
+	/** n角形のうち、特徴的な四角形のタグを表します。タグの内容は「四角形」「正方形」「長方形」「菱形」「等脚台形」です。 */
 	private String[] quadrangleTag = { polygonTag[1], "正方形", "長方形", "菱形", "等脚台形" };
-	/** 特徴的な五角形のタグを表します。(五角形・正五角形) */
+	/** n角形のうち、特徴的な五角形のタグを表します。タグの内容は「五角形」「正五角形」です。 */
 	private String[] pentagonTag = { polygonTag[2], "正五角形" };
-	/** 特徴的な六角形のタグを表します。(六角形・正六角形) */
+	/** n角形のうち、特徴的な六角形のタグを表します。タグの内容は「六角形」「正六角形」です。 */
 	private String[] hexagonTag = { polygonTag[3], "正六角形" };
+	
+	// 以下、図形要素(n角形のみ)のタグ合計を表します。
 
-	/**
-	 * 以下、図形要素(n角形)のタグ合計を保持する配列です。
-	 */
-	/** 特徴的な三角形のタグ合計を保持します。(三角形・正三角形・二等辺三角形・直角三角形) */
+	/** n角形のうち、特徴的な三角形のタグ合計を保持します。(三角形・正三角形・二等辺三角形・直角三角形) */
 	private int[] triangleNum = new int[triangleTag.length];
-	/** 特徴的な四角形のタグ合計を保持します。(四角形・正方形・長方形・菱形・等脚台形) */
+	/** n角形のうち、特徴的な四角形のタグ合計を保持します。(四角形・正方形・長方形・菱形・等脚台形) */
 	private int[] quadrangleNum = new int[quadrangleTag.length];
-	/** 特徴的な五角形のタグ合計を保持します。(五角形・正五角形) */
+	/** n角形のうち、特徴的な五角形のタグ合計を保持します。(五角形・正五角形) */
 	private int[] pentagonNum = new int[pentagonTag.length];
-	/** 特徴的な六角形のタグ合計を保持します。(六角形・正六角形) */
+	/** n角形のうち、特徴的な六角形のタグ合計を保持します。(六角形・正六角形) */
 	private int[] hexagonNum = new int[hexagonTag.length];
-
-	/**
-	 * 以下、図形要素(n角形・円)同士の関係性のタグを表す配列です。(XとYを置き換えて利用します。)
-	 */
+	
+	//
+	
 	/** 線分と円の関係性のタグを表します。(「XとYが接する」・「XとYが1点で交わる」・「XとYが2点で交わる」) */
 	private String[] relationLCTag = { "XとYが接する.", "XとYが1点で交わる.", "XとYが2点で交わる." };
 	/** n角形から見た円との関係性のタグを表します。(「XがYに内接する」・「XがYの内部に存在する」・「XとYが互いに隣接する」) */
@@ -73,10 +80,7 @@ public class AutomaticTag {
 	private String[] relationPPTag = { "XがYに内接する.", "XがYの内部に存在する.", "XとYが互いに隣接する.", "XとYが互いに重なり合う." };
 	/** 円同士の関係性のタグを表します。(「XがYの内側で接する」・「XがYの内部に存在する」・「XとYが互いに外接する」・「XとYが互いに重なり合う」) */
 	private String[] relationCCTag = { "XがYの内側で接する.", "XがYの内部に存在する.", "XとYが互いに外接する.", "XとYが互いに重なり合う." };
-
-	/**
-	 * 以下、幾何要素(線分・円)同士、図形要素(n角形・円)同士の関係性のタグ合計を保持する配列です。
-	 */
+	
 	/** 線分と円の関係性のタグ合計を保持します。(「XとYが接する」・「XとYが1点で交わる」・「XとYが2点で交わる」) */
 	private int[] relationLCNum = new int[relationLCTag.length];
 	/** n角形から見た円との関係性のタグ合計を保持します。(「XがYに内接する」・「XがYの内部に存在する」・「XとYが隣接する」) */
@@ -93,16 +97,16 @@ public class AutomaticTag {
 	private int[] relationCCNum2 = new int[2];
 
 	/**
-	 * AutomaticTagオブジェクトを作成します。
+	 * ImageProcessingとElementAnalysisを指定し、AutomaticTagオブジェクトを作成します。
 	 * 
-	 * @param _imgProc ImageProcessingクラス
+	 * @param _imgProc  ImageProcessingクラス
 	 * @param _elemAnal ElementAnalysisクラス
 	 */
 	public AutomaticTag(ImageProcessing _imgProc, ElementAnalysis _elemAnal) {
 		this.imgProc = _imgProc;
 		this.elemAnal = _elemAnal;
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -424,11 +428,9 @@ public class AutomaticTag {
 	private PrintWriter writeColumnName(PrintWriter pw) {
 		pw.print("ファイル名" + ",");
 
-		// E1
 		pw.print(pointTag + ",");
 		pw.print(lineTag + ",");
 
-		// E2
 		for (int i = 0; i < triangleTag.length; i++) {
 			pw.print(triangleTag[i] + ",");
 		}
@@ -443,26 +445,22 @@ public class AutomaticTag {
 		}
 		pw.print(circleTag + ",");
 
-		// R1
 		for (int i = 0; i < relationLCTag.length; i++) {
 			pw.print("「" + setRelationTag(relationLCTag[i], lineTag, circleTag) + "」" + ",");
 		}
 
-		// R2
 		for (int i = 0; i < polygonTag.length; i++) {
 			for (int j = 0; j < relationPCTag.length; j++) {
 				pw.print("「" + setRelationTag(relationPCTag[j], polygonTag[i], circleTag) + "」" + ",");
 			}
 		}
 
-		// R3
 		for (int i = 0; i < polygonTag.length; i++) {
 			for (int j = 0; j < relationCPTag.length; j++) {
 				pw.print("「" + setRelationTag(relationCPTag[j], circleTag, polygonTag[i]) + "」" + ",");
 			}
 		}
 
-		// R4_1
 		for (int i = 0; i < polygonTag.length; i++) {// 4
 			for (int j = 0; j < polygonTag.length; j++) {// 4
 				for (int k = 0; k < 2; k++) {
@@ -471,7 +469,6 @@ public class AutomaticTag {
 			}
 		}
 
-		// R4_2
 		for (int i = 0; i < polygonTag.length; i++) {
 			for (int j = i; j < polygonTag.length; j++) {
 				for (int k = 2; k < 4; k++) {
@@ -480,7 +477,6 @@ public class AutomaticTag {
 			}
 		}
 
-		// R5_1～R5_2
 		for (int i = 0; i < relationCCTag.length; i++) {
 			pw.print("「" + setRelationTag(relationCCTag[i], circleTag, circleTag) + "」" + ",");
 		}
@@ -490,7 +486,7 @@ public class AutomaticTag {
 
 		return pw;
 	}
-	
+
 	/**
 	 * 
 	 * @param pw
@@ -499,11 +495,9 @@ public class AutomaticTag {
 	private PrintWriter writeElementNum(PrintWriter pw) {
 		pw.print(imgProc.imgName + ",");
 
-		// E1
 		pw.print(calcConstant(this.elemAnal.detectedPoint.size(), 0.5) + ",");
 		pw.print(calcConstant(this.elemAnal.detectedLine.size(), 0.5) + ",");
 
-		// E2
 		for (int i = 0; i < triangleNum.length; i++) {
 			pw.print(calcConstant(triangleNum[i], ((i == 0) ? 1 : 2)) + ",");
 		}
@@ -526,45 +520,38 @@ public class AutomaticTag {
 	}
 
 	private PrintWriter writeRelationNum(PrintWriter pw) {
-		// R1
 		for (int i = 0; i < relationLCNum.length; i++) {
 			pw.print(calcConstant(relationLCNum[i], 2) + ",");
 		}
 
-		// R2
 		for (int i = 0; i < relationPCNum.length; i++) {
 			for (int j = 0; j < relationPCNum[i].length; j++) {
 				pw.print(calcConstant(relationPCNum[i][j], 3) + ",");
 			}
 		}
 
-		// R3
 		for (int i = 0; i < relationCPNum.length; i++) {
 			for (int j = 0; j < relationCPNum[i].length; j++) {
 				pw.print(calcConstant(relationCPNum[i][j], 3) + ",");
 			}
 		}
 
-		// R4_1
 		for (int i = 0; i < relationPPNum1.length; i++) {
 			for (int j = 0; j < relationPPNum1[i].length; j++) {
 				pw.print(calcConstant(relationPPNum1[i][j], 3) + ",");
 			}
 		}
 
-		// R4_2
 		for (int i = 0; i < relationPPNum2.length; i++) {
 			for (int j = 0; j < relationPPNum2[i].length; j++) {
 				pw.print(calcConstant(relationPPNum2[i][j], 3) + ",");
 			}
 		}
 
-		// R5_1
 		for (int i = 0; i < relationCCNum1.length; i++) {
 			pw.print(calcConstant(relationCCNum1[i], 3) + ",");
 		}
 
-		// R5_2
 		for (int i = 0; i < relationCCNum2.length; i++) {
 			pw.print(calcConstant(relationCCNum2[i], 3) + ",");
 		}
@@ -580,4 +567,3 @@ public class AutomaticTag {
 		return c * (double) value;
 	}
 }
-

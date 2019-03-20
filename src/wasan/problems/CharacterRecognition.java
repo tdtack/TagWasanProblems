@@ -23,11 +23,12 @@ import org.tensorflow.types.UInt8;
 
 /**
  * 和算図形問題に含まれる文字要素の認識に関するクラスです。
+ * 文字要素の認識にはTensorFlowのライブラリ、Pythonで文字要素を学習させたpbファイルを必要とします。
  * 
  * @author Takuma Tsuchihashi
  *
  */
-public class CharacterRecognition {// 変数、関数名 保留
+public class CharacterRecognition {
 
 	/** CharacterRecognitionクラス内で画像処理を利用する。 */
 	private ImageProcessing imgProc;

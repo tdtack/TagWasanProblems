@@ -16,7 +16,6 @@ public class WasanMain {
 		File folder = new File("dat/input/problems");
 		File[] file = folder.listFiles();
 		int fileNum = file.length;
-		//int fileNum = 1;
 
 		NewFrame[] frame = new NewFrame[fileNum];
 		NewCanvas[] canvas = new NewCanvas[fileNum];
@@ -38,7 +37,6 @@ public class WasanMain {
 			}
 
 			String filePath = String.valueOf(file[i]);
-			//String filePath = folder.getPath() + "\\" + "068" + ".PNG";
 			String imgName = filePath.split("\\\\", 0)[3];// Åô
 			String imgNum = imgName.substring(0, imgName.indexOf("."));// Åô
 
@@ -79,8 +77,6 @@ public class WasanMain {
 
 		System.out.println();
 		System.out.println("complete");
-
-		//System.exit(0);
 	}
 
 	private static void saveDisplay(NewCanvas canvas, String imgName) {

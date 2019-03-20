@@ -10,10 +10,10 @@ import java.util.ArrayList;
  */
 public class MyCircle {
 	/** 円の中心を表す変数 */
-	public MyPoint center;// ☆
+	public MyPoint center;
 
 	/** 円の半径を表す変数 */
-	public double radius;// ☆
+	public double radius;
 
 	/** 円周上の8点の情報を持つ配列 */
 	public MyPoint[] circum = new MyPoint[8];// ☆
@@ -22,10 +22,10 @@ public class MyCircle {
 	 * 円の方程式における3つの係数を表す変数 <br>
 	 * 円の方程式は x^2+bx+y^2+cy+d=0 で表すものとする。
 	 */
-	public double b, c, d;// ☆
+	public double b, c, d;
 
 	/** 上記の3つの係数を正規化した変数 */
-	public double nb, nc, nd;// ☆
+	public double nb, nc, nd;
 
 	/**
 	 * コンストラクタ

@@ -21,7 +21,7 @@ import java.util.ArrayList;
  */
 public class HoughTransform {
 
-	/** HoughTransformクラス内で画像処理を利用する。 */
+	/** HoughTransformクラス内で画像処理を利用します。 */
 	private ImageProcessing imgProc;
 
 	/** 直線抽出に用いられる変数・配列 */

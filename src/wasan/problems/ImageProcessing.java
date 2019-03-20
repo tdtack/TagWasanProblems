@@ -1,9 +1,5 @@
 package wasan.problems;
 
-/**
- * 画像処理に特化したクラス
- */
-
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -14,7 +10,8 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 /**
- * 和算図形問題への自動タグ付けで活用する画像処理に関するクラスです。
+ * 和算図形問題への自動タグ付けの際に利用する画像処理に関するクラスです。
+ * 図形問題画像の二値化やクロージング処理など、画像処理のメソッドはこのクラスから利用します。
  * 
  * @author Takuma Tsuchihashi
  *
@@ -51,8 +48,7 @@ public class ImageProcessing {
 		System.out.println("< 図形問題 >");
 		System.out.println(filePath);
 		System.out.println();
-
-		// 画像の読み込みとリサイズ
+		
 		originalImg = loadImage(filePath);
 		originalImg = resizeImage(500);// 画像のリサイズ
 
@@ -446,8 +442,7 @@ public class ImageProcessing {
 							}
 						}
 					}
-
-					 //System.out.println(blackCount+", "+0.03 * (character.getWidth() * character.getHeight()));
+					
 					if (blackCount > 0.03 * (character.getWidth() * character.getHeight())) {
 						characterList.add(character);
 					}
