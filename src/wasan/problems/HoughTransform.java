@@ -13,25 +13,36 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+//☆
 /**
- * 和算図形問題に含まれる幾何要素(線分・円)の認識で活用するHough変換に関するクラスです。
+ * 和算図形問題に含まれる幾何要素(線分・円)の認識で利用するHough変換に関するクラスです。<br>
+ * (独自のアルゴリズムが走っている)
  * 
  * @author Kazushi Ahara, Takuma Tsuchihashi
- *
  */
 public class HoughTransform {
 
-	/** HoughTransformクラス内で画像処理を利用します。 */
+	// ☆
+	/**
+	 * 画像処理を利用するためのImageProcessingクラス変数です。<br>
+	 * この変数を用いることでImageProcessingクラス内のメソッドなどを呼び出すことができます。
+	 */
 	private ImageProcessing imgProc;
 
-	/** 直線抽出に用いられる変数・配列 */
+	// ☆以下、図形問題からの直線抽出で利用する変数・配列です。
+	/**
+	 * 
+	 */
 	private int[][] fieldLine;
 	private int maxWidth, maxHeight;
 
 	private double cos[], sin[];
 	private int maxRho, maxTheta;
 
-	/** 線分抽出に用いられる配列・リスト */
+	// ☆以下、図形問題からの線分抽出で利用する配列・リストです。
+	/**
+	 * 
+	 */
 	private int[][] subArray;
 	private int[] subsubArray;
 	private int[] sub2subArray;
@@ -41,7 +52,10 @@ public class HoughTransform {
 
 	private ArrayList<MyLine> houghLine;
 
-	/** 円抽出に用いられる変数・配列 */
+	// ☆以下、図形問題からの円抽出で利用する変数・配列です。
+	/**
+	 * 
+	 */
 	private int[][][] fieldCircle;
 	private double maxRadius;
 	private double[][] radius;
@@ -89,6 +103,12 @@ public class HoughTransform {
 		static int fillGapSubArraySize = 7;
 	}
 
+	/**
+	 * 画像処理(ImageProcessing)を指定し、Hough変換(HoughTransform)のインスタンスを生成するコンストラクタです。<br>
+	 * 
+	 * @param _imgProc
+	 *            画像処理を利用するためのImageProcessingクラス変数
+	 */
 	public HoughTransform(ImageProcessing _imgProc) {
 		imgProc = _imgProc;
 
@@ -124,7 +144,10 @@ public class HoughTransform {
 
 		houghLine = new ArrayList<MyLine>();
 	}
-
+	
+	/**
+	 * 
+	 */
 	public void freeResource() {
 		imgProc = null;
 
@@ -401,8 +424,9 @@ public class HoughTransform {
 	/**
 	 * 線分に関する配列の整理方法
 	 * 
-	 * @param isW   <br>
-	 *              true:x軸に投射, false:y軸に投射
+	 * @param isW
+	 *            <br>
+	 *            true:x軸に投射, false:y軸に投射
 	 * @param theta
 	 * @param rho
 	 * @return
@@ -630,10 +654,12 @@ public class HoughTransform {
 									&& subsubArray[x] != subsubArray[x + 1] - 1) {
 								rIncr = subsubArray[x] - subsubArray[xIncr];
 								dxIncr = x - xIncr;
-								// System.out.println("xIncr, rIncr, dxIncr = "+xIncr+","+rIncr+","+dxIncr);
+								// System.out.println("xIncr, rIncr, dxIncr =
+								// "+xIncr+","+rIncr+","+dxIncr);
 								if ((rIncr > 6 && rIncr * 20 > dxIncr) || (rIncr > 4 && rIncr * 15 > dxIncr)) {// 断続的に増加している条件
 									countIncrDecr += dxIncr;
-									// System.out.println("OK: countIncrDecr = "+countIncrDecr);
+									// System.out.println("OK: countIncrDecr =
+									// "+countIncrDecr);
 									for (int xx = xIncr; xx < x; xx++) {
 										sub5subArray[xx] = 1;
 									}
@@ -664,10 +690,12 @@ public class HoughTransform {
 									&& subsubArray[x] != subsubArray[x + 1] + 1) {
 								rDecr = subsubArray[xDecr] - subsubArray[x];
 								dxDecr = x - xDecr;
-								// System.out.println("xDecr, rDecr, dxDecr = "+xDecr+","+rDecr+","+dxDecr);
+								// System.out.println("xDecr, rDecr, dxDecr =
+								// "+xDecr+","+rDecr+","+dxDecr);
 								if ((rDecr > 6 && rDecr * 20 > dxDecr) || (rDecr > 4 && rDecr * 15 > dxDecr)) {// 断続的に減少している条件
 									countIncrDecr += dxDecr;
-									// System.out.println("OK: countIncrDecr = "+countIncrDecr);
+									// System.out.println("OK: countIncrDecr =
+									// "+countIncrDecr);
 									for (int xx = xDecr; xx < x; xx++) {
 										sub5subArray[xx] = 1;
 									}
@@ -694,10 +722,12 @@ public class HoughTransform {
 					if (xIncr > 0) {
 						rIncr = subsubArray[x] - subsubArray[xIncr];
 						dxIncr = x - xIncr;
-						// System.out.println("xIncr, rIncr, dxIncr = "+xIncr+","+rIncr+","+dxIncr);
+						// System.out.println("xIncr, rIncr, dxIncr =
+						// "+xIncr+","+rIncr+","+dxIncr);
 						if ((rIncr > 6 && rIncr * 20 > dxIncr) || (rIncr > 4 && rIncr * 15 > dxIncr)) {// 断続的に増加している条件
 							countIncrDecr += dxIncr;
-							// System.out.println("OK: countIncrDecr = "+countIncrDecr);
+							// System.out.println("OK: countIncrDecr =
+							// "+countIncrDecr);
 							for (int xx = xIncr; xx < x; xx++) {
 								sub5subArray[xx] = 1;
 							}
@@ -708,10 +738,12 @@ public class HoughTransform {
 					if (xDecr > 0) {
 						rDecr = subsubArray[xDecr] - subsubArray[x];
 						dxDecr = x - xDecr;
-						// System.out.println("xDecr, rDecr, dxDecr = "+xDecr+","+rDecr+","+dxDecr);
+						// System.out.println("xDecr, rDecr, dxDecr =
+						// "+xDecr+","+rDecr+","+dxDecr);
 						if ((rDecr > 6 && rDecr * 20 > dxDecr) || (rDecr > 4 && rDecr * 15 > dxDecr)) {// 断続的に増加している条件
 							countIncrDecr += dxDecr;
-							// System.out.println("OK: countIncrDecr = "+countIncrDecr);
+							// System.out.println("OK: countIncrDecr =
+							// "+countIncrDecr);
 							for (int xx = xDecr; xx < x; xx++) {
 								sub5subArray[xx] = 1;
 							}
@@ -785,10 +817,15 @@ public class HoughTransform {
 
 		for (int x = 0; x < maxWidth; x += d) {
 			for (int y = 0; y < maxHeight; y += d) {
-				if ((imgProc.editingImg.getRGB(x, y) & 0xFF) < 128) {// (image.getRGB(x, y) >> 16 & 0xFF) < 128
+				if ((imgProc.editingImg.getRGB(x, y) & 0xFF) < 128) {// (image.getRGB(x,
+																		// y) >>
+																		// 16 &
+																		// 0xFF)
+																		// < 128
 					for (int cx = 0; cx < maxWidth; cx += d) {
 						for (int cy = 0; cy < maxHeight; cy += d) {
-							// double cr = radius[Math.abs(cx - x)][Math.abs(cy - y)];
+							// double cr = radius[Math.abs(cx - x)][Math.abs(cy
+							// - y)];
 							int cr = (int) radius[Math.abs(cx - x)][Math.abs(cy - y)];
 							if (cr < maxRadius) {// maxRadius-1でもよし
 								// fieldCircle[cx][cy][(int) cr]++;
@@ -881,4 +918,3 @@ public class HoughTransform {
 		System.exit(0);
 	}
 }
-

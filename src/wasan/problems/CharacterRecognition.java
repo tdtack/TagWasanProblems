@@ -21,45 +21,75 @@ import org.tensorflow.Session;
 import org.tensorflow.Tensor;
 import org.tensorflow.types.UInt8;
 
+//☆
 /**
- * 和算図形問題に含まれる文字要素の認識に関するクラスです。
- * 文字要素の認識にはTensorFlowのライブラリ、Pythonで文字要素を学習させたpbファイルを必要とします。
+ * 和算図形問題に含まれる文字要素の認識に関するクラスです。<br>
+ * 文字要素の学習はPythonとTensorFlowを併用して行い、学習データとしてpbファイルを生成します。
+ * 文字要素の認識はJavaとTensorFlowを併用して行い、学習データであるpbファイルを利用します。
  * 
  * @author Takuma Tsuchihashi
- *
  */
 public class CharacterRecognition {
 
-	/** CharacterRecognitionクラス内で画像処理を利用する。 */
+	// ☆
+	/**
+	 * 画像処理を利用するためのImageProcessingクラス変数です。<br>
+	 * この変数を用いることでImageProcessingクラス内のメソッドなどを呼び出すことができます。
+	 */
 	private ImageProcessing imgProc;
 
-	/** 図形問題中の文字要素のみを残した画像を表す。 */
+	// ☆
+	/**
+	 * 図形問題に含まれる文字要素のみを抽出した画像を表します。<br>
+	 */
 	private BufferedImage characterImg;
 
-	/** 図形問題から切り出した文字要素の画像を保持する。 */
+	// ☆
+	/**
+	 * 図形問題から切り出した各々の文字要素の画像を保持します。<br>
+	 * 文字要素はcharacterImgから切り出します。
+	 */
 	private ArrayList<BufferedImage> characterList;
 
-	/** 図形問題から切り出した文字要素の回転画像を保持する。 */
+	// ☆
+	/**
+	 * 図形問題から切り出した各々の文字要素を回転させた画像を保持します。<br>
+	 * characterList内の文字要素1つに対し、回転で生成される画像の枚数は回転角度により決定します。
+	 */
 	private BufferedImage[][] characterRotation;
 
+	// ☆
 	/**
-	 * コンストラクタ
+	 * 画像処理(ImageProcessing)を指定し、文字認識(CharacterRecognition)のインスタンスを生成するコンストラクタです。<br>
 	 * 
 	 * @param _imgProc
+	 *            画像処理を利用するためのImageProcessingクラス変数
 	 */
 	public CharacterRecognition(ImageProcessing _imgProc) {
 		this.imgProc = _imgProc;
 
-		this.characterImg = imgProc.dilateImage(imgProc.characterImg, 5, 3);
-		this.characterList = imgProc.labelImage(this.characterImg);
-		this.characterRotation = imgProc.rotateImage(characterList);
+		this.characterImg = imgProc.dilateImage(imgProc.characterImg, 5, 3);// 図形問題に含まれる文字要素を抽出した画像の膨張処理を実行します。
+		this.characterList = imgProc.labelImage(this.characterImg);// 図形問題に含まれる文字要素を抽出した画像にラベリングを行い、文字要素を切り出します。
+		this.characterRotation = imgProc.rotateImage(characterList);// 図形問題から切り出した文字要素を回転させた画像を生成します。
 	}
 
+	// ☆
+	/**
+	 * 図形問題から切り出した文字要素を認識し、タグを付与します。<br>
+	 */
 	public void printResult() {
-		printBestResult(characterRotation);
+		printBestResult(characterRotation);// 図形問題から切り出した文字要素を回転させた画像を認識し、タグを付与します。
 	}
 
-	private void printBestResult(BufferedImage[][] imageFiles) {// result//ベスト
+	// ☆
+	/**
+	 * 図形問題から切り出した文字要素を回転させた画像を認識し、タグを付与します。<br>
+	 * 文字要素1つにつき回転画像8枚をそれぞれ認識し、正解率が最も高い結果をタグ付けします。
+	 * 
+	 * @param imageFiles
+	 *            図形問題から切り出した各々の文字要素の回転画像を保持するBufferedImage型配列
+	 */
+	private void printBestResult(BufferedImage[][] imageFiles) {// result
 		String dir = "dat/input/ocr";
 
 		byte[] graphDef = readAllBytesOrExit(Paths.get(dir, "wasan_model_09091142.pb")); // pbファイル読み込み
@@ -92,9 +122,13 @@ public class CharacterRecognition {
 
 			System.out.println("・ 文字[" + i + "] > " + result[index] + "(" + accuracy[index] + "%)");
 		}
-
 	}
 
+	/**
+	 * 
+	 * @param imageBytes
+	 * @return
+	 */
 	private static Tensor<Float> constructAndExecuteGraphToNormalizeImage(byte[] imageBytes) {// 画像を正規化するためにグラフを作成、実行する
 		try (Graph g = new Graph()) {
 			GraphBuilder b = new GraphBuilder(g);
@@ -117,6 +151,12 @@ public class CharacterRecognition {
 		}
 	}
 
+	/**
+	 * 
+	 * @param graphDef
+	 * @param image
+	 * @return
+	 */
 	private static float[] executeInceptionGraph(byte[] graphDef, Tensor<Float> image) {// グラフと入力画像から正解を得る
 		try (Graph g = new Graph()) {
 			g.importGraphDef(graphDef);
@@ -138,6 +178,11 @@ public class CharacterRecognition {
 		}
 	}
 
+	/**
+	 * 
+	 * @param probabilities
+	 * @return
+	 */
 	private static int maxIndex(float[] probabilities) {// 推定として正しいindexを選択する
 		int best = 0;
 		for (int i = 1; i < probabilities.length; ++i) {
@@ -148,6 +193,11 @@ public class CharacterRecognition {
 		return best;
 	}
 
+	/**
+	 * 
+	 * @param input
+	 * @return
+	 */
 	private static byte[] readAllBytesfromImage(BufferedImage input) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		BufferedOutputStream bos = new BufferedOutputStream(baos);
@@ -162,6 +212,11 @@ public class CharacterRecognition {
 		return baos.toByteArray();
 	}
 
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 */
 	private static byte[] readAllBytesOrExit(Path path) {// pbファイルや画像ファイルを読み込めるかどうか
 		try {// 成功すれば、ファイルをバイトとして読み込み開始
 			return Files.readAllBytes(path);
@@ -171,6 +226,11 @@ public class CharacterRecognition {
 		return null;
 	}
 
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 */
 	private static List<String> readAllLinesOrExit(Path path) {// 正解(ラベル)を読み込めるかどうか
 		try {// 成功すれば、ファイルから全ての行を読み取る
 			return Files.readAllLines(path, Charset.forName("UTF-8"));
@@ -180,6 +240,10 @@ public class CharacterRecognition {
 		return null;
 	}
 
+	/**
+	 * 
+	 * @author Takuma Tsuchihashi
+	 */
 	private static class GraphBuilder {
 		GraphBuilder(Graph g) {
 			this.g = g;
@@ -228,7 +292,7 @@ public class CharacterRecognition {
 
 		private Graph g;
 	}
-	
+
 	private static void showException(Exception e) {
 		StackTraceElement[] ste = e.getStackTrace();
 		System.err.println("例外発生 : " + e.getClass().getName());
@@ -237,4 +301,3 @@ public class CharacterRecognition {
 		System.exit(0);
 	}
 }
-

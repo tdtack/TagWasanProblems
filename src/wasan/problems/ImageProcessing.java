@@ -9,37 +9,51 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+//☆
 /**
- * 和算図形問題への自動タグ付けの際に利用する画像処理に関するクラスです。
- * 図形問題画像の二値化やクロージング処理など、画像処理のメソッドはこのクラスから利用します。
+ * 和算図形問題の画像を分析する際に利用する画像処理に関するクラスです。<br>
+ * 図形問題画像の二値化やクロージング処理など、画像処理のメソッドは主にこのクラスから利用します。
  * 
  * @author Takuma Tsuchihashi
- *
  */
 public class ImageProcessing {
 
-	/** 図形問題の画像ファイル名を表す。 */
+	// ☆以下、入力とする図形問題の画像ファイル名に関するString型変数です。
+	/**
+	 * 入力とする図形問題の画像ファイル名を表します。<br>
+	 * 画像ファイル名は"001.PNG","002.PNG",...のように設定するものとします。
+	 */
 	public String imgName;
-
-	/** 図形問題の画像ファイル名に含まれる番号を表す。 */
+	/**
+	 * 入力とする図形問題の画像ファイル名に含まれる番号を表します。<br>
+	 * 番号は"001","002",...のように取得されます。
+	 */
 	public String imgNum;
 
-	/** 読み込んだ図形問題の画像を表す。 */
+	// ☆以下、画像処理で扱われる画像を表すBufferedImage型変数です。
+	/**
+	 * 入力とする図形問題の元画像を表します。<br>
+	 */
 	public BufferedImage originalImg;
-
-	/** 幾何要素・図形要素の抽出と並行して処理する画像を表す。 */
+	/**
+	 * 図形問題に含まれる幾何要素、図形要素の抽出と並行して処理される画像を表します。<br>
+	 */
 	public BufferedImage editingImg;
-
-	/** 幾何要素・図形要素の抽出画像を表す。 */
+	/**
+	 * 図形問題に含まれる幾何要素、図形要素を抽出した画像を表します。<br>
+	 */
 	public BufferedImage elementImg;
-
-	/** 文字要素の抽出画像を表す。 */
+	/**
+	 * 図形問題に含まれる文字要素を抽出した画像を表します。<br>
+	 */
 	public BufferedImage characterImg;
 
+	// ☆
 	/**
-	 * コンストラクタ
+	 * 図形問題の画像ファイルパスを指定し、画像処理(ImageProcessing)のインスタンスを生成するコンストラクタです。<br>
 	 * 
 	 * @param filePath
+	 *            入力とする図形問題の画像ファイルパスを表すString型変数
 	 */
 	public ImageProcessing(String filePath) {
 		imgName = filePath.split("\\\\", 0)[3];
@@ -48,16 +62,21 @@ public class ImageProcessing {
 		System.out.println("< 図形問題 >");
 		System.out.println(filePath);
 		System.out.println();
-		
-		originalImg = loadImage(filePath);
-		originalImg = resizeImage(500);// 画像のリサイズ
 
-		// 画像の前処理
-		editingImg = preprocessImage(true);// 補完して検出しやすいものにする
+		originalImg = loadImage(filePath);// 入力とする図形問題の画像ファイルパスから画像を読み込みます。
+		originalImg = resizeImage(500);// 読み込んだ図形問題の元画像をリサイズします。
+
+		// 以下、図形問題への自動タグ付け前に画像に対する事前処理を行います。
+		editingImg = preprocessImage(true);
 		elementImg = preprocessImage(false);
-		characterImg = preprocessImage(false);// 
+		characterImg = preprocessImage(false);
 	}
-	
+
+	// ☆
+	/**
+	 * 自動タグ付けが完了した図形問題に関する不要なオブジェクトをメモリから解放します。<br>
+	 * 複数の図形問題に対して連続的に自動タグ付けを行う際、OutOfMemoryErrorを回避します。
+	 */
 	public void freeResource() {
 		this.originalImg.flush();
 		this.editingImg.flush();
@@ -65,8 +84,13 @@ public class ImageProcessing {
 		this.characterImg.flush();
 	}
 
+	// ☆
 	/**
-	 * 画像を読み込む関数
+	 * 入力とする図形問題の画像ファイルパスから画像を読み込みます。<br>
+	 * 
+	 * @param filePath
+	 *            入力とする図形問題の画像ファイルパスを表すString型変数
+	 * @return 入力とする図形問題の元画像を表すBufferedImage型変数
 	 */
 	private BufferedImage loadImage(String filePath) {
 		try {
@@ -78,7 +102,16 @@ public class ImageProcessing {
 		}
 	}
 
-	private BufferedImage resizeImage(int size) {// 画像のリサイズ
+	// ☆
+	/**
+	 * 読み込んだ図形問題の元画像をリサイズします。<br>
+	 * 元画像の縦幅と横幅のうち、長い方を基準にリサイズを行います。
+	 * 
+	 * @param size
+	 *            リサイズ後の画像の縦幅または横幅を表すint型変数
+	 * @return リサイズされた図形問題の画像を表すBufferedImage型変数
+	 */
+	private BufferedImage resizeImage(int size) {
 		BufferedImage inputImg = originalImg;
 
 		int imgWidth = inputImg.getWidth();
@@ -103,16 +136,33 @@ public class ImageProcessing {
 		return outputImg;
 	}
 
-	private BufferedImage preprocessImage(boolean closing) {// 画像の前処理
+	// ☆
+	/**
+	 * 図形問題への自動タグ付け前に画像に対する事前処理を行います。<br>
+	 * ここで行われる処理はグレースケール化・二値化・クロージング処理の3つです。
+	 * 
+	 * @param closing
+	 *            クロージング処理を実行するかどうかを決定するboolean型変数
+	 * @return 事前処理を施した画像を表すBufferedImage型変数
+	 */
+	private BufferedImage preprocessImage(boolean closing) {
 		BufferedImage outputImg = originalImg;
 
-		outputImg = grayscaleImage(outputImg);// グレースケール化
-		outputImg = binarizeImage(outputImg);
-		outputImg = (closing) ? closeImage(outputImg) : outputImg;// 膨張・収縮処理
+		outputImg = grayscaleImage(outputImg);// 図形問題の画像に対するグレースケール化を行います。
+		outputImg = binarizeImage(outputImg);// 図形問題の画像に対する二値化を行います。
+		outputImg = (closing) ? closeImage(outputImg) : outputImg;// 図形問題の画像に対するクロージング処理を行います。(closingがtrue→実行する、false→実行しない)
 
 		return outputImg;
 	}
 
+	// ☆
+	/**
+	 * 図形問題の画像に対するグレースケール化を行います。<br>
+	 * 
+	 * @param inputImg
+	 *            グレースケール化したい画像を表すBufferedImage型変数
+	 * @return グレースケール化された画像を表すBufferedImage型変数
+	 */
 	private BufferedImage grayscaleImage(BufferedImage inputImg) {
 		BufferedImage outputImg = new BufferedImage(inputImg.getWidth(), inputImg.getHeight(),
 				BufferedImage.TYPE_BYTE_GRAY);
@@ -126,9 +176,17 @@ public class ImageProcessing {
 		return outputImg;
 	}
 
-	private BufferedImage binarizeImage(BufferedImage inputImg) {// 画像の二値化
+	// ☆
+	/**
+	 * 図形問題の画像に対する二値化を行います。<br>
+	 * 
+	 * @param inputImg
+	 *            二値化したい画像を表すBufferedImage型変数
+	 * @return 二値化された画像を表すBufferedImage型変数
+	 */
+	private BufferedImage binarizeImage(BufferedImage inputImg) {
 		BufferedImage outputImg = new BufferedImage(inputImg.getWidth(), inputImg.getHeight(),
-				BufferedImage.TYPE_BYTE_GRAY); // グレースケール化
+				BufferedImage.TYPE_BYTE_GRAY);
 
 		for (int y = 0; y < inputImg.getHeight(); y++) {
 			for (int x = 0; x < inputImg.getWidth(); x++) {
@@ -140,19 +198,40 @@ public class ImageProcessing {
 		return outputImg;
 	}
 
-	public BufferedImage closeImage(BufferedImage inputImg) {// 主にクロージング処理(小さな穴を埋めるなどの処理)
+	// ☆
+	/**
+	 * 図形問題の画像に対するクロージング処理を行います。<br>
+	 * クロージング処理は、dilateImageとerodeImageを併用します。
+	 * 
+	 * @param inputImg
+	 *            クロージング処理を実行する画像を表すBufferedImage型変数
+	 * @return クロージング処理を施した画像を表すBufferedImage型変数
+	 */
+	public BufferedImage closeImage(BufferedImage inputImg) {
 		BufferedImage outputImg = inputImg;
-
-		// 膨張処理と収縮処理はそれぞれ単独で利用するのでなく、組み合わせて利用するのが一般的
+		
 		// https://algorithm.joho.info/image-processing/dilation-erosion-opening-closing-tophat-blackhat/
 		int kernelSize = 5;
 		int iteration = 2;
-		outputImg = dilateImage(outputImg, kernelSize, iteration);
-		outputImg = erodeImage(outputImg, kernelSize, iteration);
+		outputImg = dilateImage(outputImg, kernelSize, iteration);// 図形問題の画像に対するクロージング処理を行います。
+		outputImg = erodeImage(outputImg, kernelSize, iteration);// 図形問題の画像のクロージング処理における収縮処理を実行します。
 
 		return outputImg;
 	}
 
+	// ☆
+	/**
+	 * 図形問題の画像のクロージング処理における膨張処理を実行します。<br>
+	 * クロージング処理では、このメソッドとerodeImageを併用します。
+	 * 
+	 * @param inputImg
+	 *            膨張処理を実行する画像を表すBufferedImage型変数
+	 * @param kernelSize
+	 *            膨張処理において注目する画素範囲(正方行列)のサイズを表すint型変数
+	 * @param iteration
+	 *            膨張処理の繰り返し回数を表すint型変数
+	 * @return 膨張処理を施した画像を表すBufferedImage型変数
+	 */
 	public BufferedImage dilateImage(BufferedImage inputImg, int kernelSize, int iteration) {
 		BufferedImage outputImg = new BufferedImage(inputImg.getWidth(), inputImg.getHeight(),
 				BufferedImage.TYPE_BYTE_GRAY);
@@ -183,6 +262,19 @@ public class ImageProcessing {
 		return (iteration > 1) ? dilateImage(outputImg, kernelSize, iteration - 1) : outputImg;
 	}
 
+	// ☆
+	/**
+	 * 図形問題の画像のクロージング処理における収縮処理を実行します。<br>
+	 * クロージング処理では、このメソッドとdilateImageを併用します。
+	 * 
+	 * @param inputImg
+	 *            収縮処理を実行する画像を表すBufferedImage型変数
+	 * @param kernelSize
+	 *            収縮処理において注目する画素範囲(正方行列)のサイズを表すint型変数
+	 * @param iteration
+	 *            収縮処理の繰り返し回数を表すint型変数
+	 * @return 収縮処理を施した画像を表すBufferedImage型変数
+	 */
 	public BufferedImage erodeImage(BufferedImage inputImg, int kernelSize, int iteration) {
 		BufferedImage outputImg = new BufferedImage(inputImg.getWidth(), inputImg.getHeight(),
 				BufferedImage.TYPE_BYTE_GRAY);
@@ -213,6 +305,15 @@ public class ImageProcessing {
 		return (iteration > 1) ? erodeImage(outputImg, kernelSize, iteration - 1) : outputImg;
 	}
 
+	// ☆
+	/**
+	 * 図形問題の画像から抽出された線分を除去します。<br>
+	 * この除去は他の幾何要素の誤検出を軽減することを目的としています。
+	 * 
+	 * @param lineList
+	 *            抽出された線分を保持するMyLineクラスリスト
+	 * @return 抽出された線分を除去した図形問題の画像を表すBufferedImage型変数
+	 */
 	public BufferedImage removeLine(ArrayList<MyLine> lineList) {// 線分要素の除去
 		for (int y = 0; y < editingImg.getHeight(); y++) {
 			for (int x = 0; x < editingImg.getWidth(); x++) {
@@ -229,6 +330,15 @@ public class ImageProcessing {
 		return editingImg;
 	}
 
+	// ☆
+	/**
+	 * 図形問題の画像から抽出した円を除去します。<br>
+	 * この除去は他の幾何要素の誤検出を軽減することを目的としています。
+	 * 
+	 * @param circleList
+	 *            抽出された円を保持するMyCircleクラスリスト
+	 * @return 抽出された円を除去した図形問題の画像を表すBufferedImage型変数
+	 */
 	public BufferedImage removeCircle(ArrayList<MyCircle> circleList) {// 円要素の除去
 		for (int y = 0; y < editingImg.getHeight(); y++) {
 			for (int x = 0; x < editingImg.getWidth(); x++) {
@@ -245,6 +355,17 @@ public class ImageProcessing {
 		return editingImg;
 	}
 
+	// ☆
+	/**
+	 * 図形問題に含まれる幾何要素を抽出した画像および文字要素を抽出した画像を生成します。<br>
+	 * これらの2つの画像の和は図形問題の元画像に等しいです。
+	 * 
+	 * @param lineList
+	 *            抽出された線分を保持するMyLineクラスリスト
+	 * @param circleList
+	 *            抽出された円を保持するMyCircleクラスリスト
+	 * @return 幾何要素を抽出した画像および文字要素を抽出した画像の2つの画像を保持するBufferedImage型配列
+	 */
 	public BufferedImage[] clipImage(ArrayList<MyLine> lineList, ArrayList<MyCircle> circleList) {
 		BufferedImage[] imgArray = new BufferedImage[2];
 
@@ -286,9 +407,18 @@ public class ImageProcessing {
 		return imgArray;
 	}
 
+	// ☆
+	/**
+	 * 図形問題に含まれる文字要素を抽出した画像にラベリングを行い、文字要素を切り出します。<br>
+	 * 
+	 * @param inputImg
+	 *            文字要素を抽出した画像を表すBufferedImage型変数
+	 * @return 切り出した文字要素の画像を保持するBufferedImage型リスト
+	 */
 	public ArrayList<BufferedImage> labelImage(BufferedImage inputImg) {
 		ArrayList<BufferedImage> characterList = new ArrayList<BufferedImage>();
 
+		// ラベリング
 		int label = 0;
 		int[][] labelNum = new int[inputImg.getWidth()][inputImg.getHeight()];
 
@@ -359,6 +489,7 @@ public class ImageProcessing {
 			}
 		}
 
+		// 位置の特定
 		int[][] labelEdge = new int[label + 1][4];
 		boolean[] edgeCheck = new boolean[label + 1];
 		for (int y = 0; y < inputImg.getHeight(); y++) {
@@ -392,8 +523,10 @@ public class ImageProcessing {
 			int halfWidth = Math.abs(labelEdge[i][0] - labelEdge[i][1]) / 2;
 			int halfHeight = Math.abs(labelEdge[i][2] - labelEdge[i][3]) / 2;
 
-			int rectX = (centerX - halfWidth) - margin;// label_edge[i][0] - margin;
-			int rectY = (centerY - halfHeight) - margin;// label_edge[i][2] - margin;
+			int rectX = (centerX - halfWidth) - margin;// label_edge[i][0] -
+														// margin;
+			int rectY = (centerY - halfHeight) - margin;// label_edge[i][2] -
+														// margin;
 
 			int rectWidth = 2 * (halfWidth + margin);
 			int rectHeight = 2 * (halfHeight + margin);
@@ -407,7 +540,7 @@ public class ImageProcessing {
 					rectX -= gapSize / 2;
 				}
 
-				// a切り取り位置の調整完了
+				// 切り取り位置の調整完了
 
 				boolean inLeft = (0 <= rectX);
 				boolean inRight = ((rectX + rectSize) < characterImg.getWidth());
@@ -442,7 +575,7 @@ public class ImageProcessing {
 							}
 						}
 					}
-					
+
 					if (blackCount > 0.03 * (character.getWidth() * character.getHeight())) {
 						characterList.add(character);
 					}
@@ -455,6 +588,15 @@ public class ImageProcessing {
 		return characterList;
 	}
 
+	// ☆
+	/**
+	 * 図形問題から切り出した文字要素を回転させた画像を生成します。<br>
+	 * 文字要素1つに対し、回転で生成される画像の枚数は回転角度により決定します。
+	 * 
+	 * @param characterList
+	 *            切り出した文字要素の画像を保持するBufferedImage型リスト
+	 * @return 文字要素を回転させた画像を保持するBufferedImage型配列
+	 */
 	public BufferedImage[][] rotateImage(ArrayList<BufferedImage> characterList) {
 		int twoPI = 360;
 		int radian = 45;
@@ -522,6 +664,11 @@ public class ImageProcessing {
 		return characterRotation;
 	}
 
+	/**
+	 * 
+	 * @param color
+	 * @return
+	 */
 	public int intRGB(int... color) {
 		if (color.length == 1) {
 			return 0xff000000 | color[0] << 16 | color[0] << 8 | color[0];
@@ -530,7 +677,11 @@ public class ImageProcessing {
 		}
 		return 0xff000000 | 128 << 16 | 128 << 8 | 128;
 	}
-	
+
+	/**
+	 * 
+	 * @param e
+	 */
 	private void showException(Exception e) {
 		StackTraceElement[] ste = e.getStackTrace();
 		System.err.println("例外発生 : " + e.getClass().getName());
@@ -539,4 +690,3 @@ public class ImageProcessing {
 		System.exit(0);
 	}
 }
-

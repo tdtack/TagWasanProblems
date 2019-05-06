@@ -12,7 +12,16 @@ import java.io.PrintStream;
 import javax.imageio.ImageIO;
 
 public class WasanMain {
-	public static void main(String[] args) throws IOException {
+
+	// ☆
+	/**
+	 * 図形問題へのタグ付けにおいて、最初に実行されるメソッドです。<br>
+	 * メソッド内には図形問題に対するタグ付けの過程が記述されています。
+	 * 
+	 * @param args
+	 *            mainメソッドで必要とされるString型配列
+	 */
+	public static void main(String[] args) {
 		File folder = new File("dat/input/problems");
 		File[] file = folder.listFiles();
 		int fileNum = file.length;
@@ -51,7 +60,7 @@ public class WasanMain {
 				canvas[i] = new NewCanvas(filePath);
 
 				frame[i].add(canvas[i]);
-				frame[i].addWindowListener(new NewAdapter());// frame.setUndecorated(true);
+				frame[i].addWindowListener(new NewAdapter());
 				frame[i].addNotify();
 
 				Insets insets = frame[i].getInsets();
@@ -79,6 +88,16 @@ public class WasanMain {
 		System.out.println("complete");
 	}
 
+	// ☆
+	/**
+	 * 図形問題に含まれる幾何要素(点・線分・円)を抽出し、キャンバスに描画したものを画像ファイルとして保存します。<br>
+	 * キャンバスの左側に幾何要素の抽出結果、右側に幾何要素の切り出し結果を表示した状態が保存されます。
+	 * 
+	 * @param canvas
+	 *            抽出した幾何要素が描画されたキャンバスを表すNewCanvasクラス変数
+	 * @param imgName
+	 *            図形問題の画像ファイル名を表すString型変数
+	 */
 	private static void saveDisplay(NewCanvas canvas, String imgName) {
 		BufferedImage resultImg = new BufferedImage(canvas.getWidth(), canvas.getHeight(), BufferedImage.TYPE_INT_RGB);
 
@@ -92,4 +111,3 @@ public class WasanMain {
 		}
 	}
 }
-

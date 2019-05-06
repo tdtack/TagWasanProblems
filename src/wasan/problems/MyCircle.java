@@ -3,37 +3,65 @@ package wasan.problems;
 import java.util.ArrayList;
 
 /**
- * 和算図形問題に含まれる円(幾何要素・図形要素)に関するクラスです。
+ * 和算図形問題に含まれる幾何要素の「円」に関するクラスです。 <br>
+ * この円は図形要素として扱う場合もあります。
  * 
  * @author Takuma Tsuchihashi
- *
  */
 public class MyCircle {
-	/** 円の中心を表す変数 */
+
+	// ☆以下、円を構成する要素を表す変数・配列です。
+	/**
+	 * 円の中心を表します。<br>
+	 */
 	public MyPoint center;
-
-	/** 円の半径を表す変数 */
+	/**
+	 * 円の半径を表します。<br>
+	 */
 	public double radius;
-
-	/** 円周上の8点の情報を持つ配列 */
-	public MyPoint[] circum = new MyPoint[8];// ☆
-
 	/**
-	 * 円の方程式における3つの係数を表す変数 <br>
-	 * 円の方程式は x^2+bx+y^2+cy+d=0 で表すものとする。
+	 * 円周上の8点を表します。<br>
 	 */
-	public double b, c, d;
+	public MyPoint[] circum = new MyPoint[8];
 
-	/** 上記の3つの係数を正規化した変数 */
-	public double nb, nc, nd;
-
+	// ☆以下、円をx^2+bx+y^2+cy+d=0の方程式で表現した際のパラメータを表すdouble型変数です。
 	/**
-	 * コンストラクタ
+	 * 円を示す方程式x^2+bx+y^2+cy+d=0の係数bを表します。<br>
+	 */
+	public double b;
+	/**
+	 * 円を示す方程式x^2+bx+y^2+cy+d=0の係数cを表します。<br>
+	 */
+	public double c;
+	/**
+	 * 円を示す方程式x^2+bx+y^2+cy+d=0の定数dを表します。<br>
+	 */
+	public double d;
+
+	// ☆以下、円を示す方程式x^2+bx+y^2+cy+d=0のパラメータを正規化した値を表すdouble型変数です。
+	/**
+	 * 円を示す方程式x^2+bx+y^2+cy+d=0の係数bを正規化した値です。<br>
+	 */
+	public double nb;
+	/**
+	 * 円を示す方程式x^2+bx+y^2+cy+d=0の係数cを正規化した値です。<br>
+	 */
+	public double nc;
+	/**
+	 * 円を示す方程式x^2+bx+y^2+cy+d=0の定数dを正規化した値です。<br>
+	 */
+	public double nd;
+
+	// ☆
+	/**
+	 * 円の中心と半径を指定し、円のインスタンスを生成するコンストラクタです。<br>
 	 * 
-	 * @param _center 円の中心
-	 * @param _radius 円の半径
+	 * @param _center
+	 *            円の中心を表すMyPointクラス変数
+	 * @param _radius
+	 *            円の半径を表すdouble型変数
 	 */
-	public MyCircle(MyPoint _center, double _radius) {// ☆
+	public MyCircle(MyPoint _center, double _radius) {
 		this.center = _center;
 		this.radius = _radius;
 
@@ -55,134 +83,127 @@ public class MyCircle {
 		this.nd = this.d / scalar;
 	}
 
+	// ☆
 	/**
-	 * 円から見たn角形との関係性 <br>
-	 * ①n角形から見た円の中心の内外 <br>
-	 * ②n角形から見た円周上の8点の状態(n角形の内側, n角形上, n角形の外側) <br>
-	 * ③円から見たn角形の全ての辺の状態(距離が半径未満, 円に接している, 距離が半径超過) <br>
-	 */
-
-	/**
+	 * 「円がn角形に内接する」を満たすか否かを判定します。 <br>
+	 * 「円がn角形に内接する」は円から見たn角形との関係性の1つです。
 	 * 
 	 * @param pg
-	 * @return
+	 *            対象となるn角形を表すMyPolygonクラス変数
+	 * @return 「円がn角形に内接する」を満たすか否かを示すboolean型変数
 	 */
 	public boolean inscribePolygon(MyPolygon pg) {
 		boolean[] condition = new boolean[3];
 
-		int[] circumState = pg.classifyCircum(this.circum);// n角形から見た円上の8点の状態
-		int[] sideState = this.classifySide(pg.side);// 円から見たn角形の辺の状態(円周とn角形の辺の接状態)
+		int[] circumState = pg.classifyCircum(this.circum);
+		int[] sideState = this.classifySide(pg.side);
 
-		condition[0] = pg.includePoint(this.center);// ①内側にある
-		condition[1] = ((circumState[0] + circumState[1]) == this.circum.length);// ②8個の点がn角形の内側またはn角形上にある(その合計が8)
-		condition[2] = (sideState[1] == pg.side.size());// ③n本の辺が円に接している(その合計がn)
+		condition[0] = pg.includePoint(this.center);
+		condition[1] = ((circumState[0] + circumState[1]) == this.circum.length);
+		condition[2] = (sideState[1] == pg.side.size());
 
 		return (condition[0] && condition[1] && condition[2]);
 	}
 
+	// ☆
 	/**
-	 * ①内側にある <br>
-	 * ②8個の点がn角形の内側またはn角形上にある(その合計が8) <br>
-	 * ③n本未満の辺が円に接している, 1本以上の辺が距離が半径超過、内側にあるのは0本(その合計がn) <br>
-	 * (③については全ての辺を吟味しなければいけないか?、合計がnになるように)
+	 * 「円がn角形の内部に存在する」を満たすか否かを判定します。 <br>
+	 * 「円がn角形の内部に存在する」は円から見たn角形との関係性の1つです。
 	 * 
 	 * @param pg
-	 * @return
+	 *            対象となるn角形を表すMyPolygonクラス変数
+	 * @return 「円がn角形の内部に存在する」を満たすか否かを示すboolean型変数
 	 */
 	public boolean insidePolygon(MyPolygon pg) {
 		boolean[] condition = new boolean[3];
 
-		int[] circumState = pg.classifyCircum(this.circum);// n角形から見た円上の8点の状態
-		int[] sideState = this.classifySide(pg.side);// 円から見たn角形の辺の状態(円周とn角形の辺の接状態)
+		int[] circumState = pg.classifyCircum(this.circum);
+		int[] sideState = this.classifySide(pg.side);
 
-		condition[0] = pg.includePoint(this.center);// n角形が円の中心を含むか
-		condition[1] = ((circumState[0] + circumState[1]) == this.circum.length); // 8点について、n角形の内側or円上
+		condition[0] = pg.includePoint(this.center);
+		condition[1] = ((circumState[0] + circumState[1]) == this.circum.length);
 		condition[2] = (sideState[0] == 0) && withinRange(sideState[1], 0, pg.side.size() - 1)
-				&& withinRange(sideState[2], 1, pg.side.size());// ☆
-		// 円の内側にあるのは0本、円に接しているのはn本未満、1本以上が外側にある
+				&& withinRange(sideState[2], 1, pg.side.size());
 
 		return (condition[0] && condition[1] && condition[2]);
 	}
 
+	// ☆
 	/**
-	 * ①内外どちらの可能性もある <br>
-	 * ②1個以上の点がn角形の内側にあるor接する, 8個未満(1個以上)の点がn角形の外側にある(その合計が8) <br>
-	 * ③1本以上の辺が距離が半径未満, n本未満の辺が円に接しているまたは距離が半径超過(その合計がn) <br>
+	 * 「円とn角形が互いに重なり合う」を満たすか否かを判定します。 <br>
+	 * 「円とn角形が互いに重なり合う」は円から見たn角形との関係性の1つです。
 	 * 
 	 * @param pg
-	 * @return
+	 *            対象となるn角形を表すMyPolygonクラス変数
+	 * @return 「円とn角形が互いに重なり合う」を満たすか否かを示すboolean型変数
 	 */
 	public boolean overlapPolygon(MyPolygon pg) {
 		boolean[][] condition = new boolean[3][2];
 
-		int[] circumState = pg.classifyCircum(this.circum);// n角形から見た円上の8点の状態
-		int[] sideState = this.classifySide(pg.side);// 円から見たn角形の辺の状態(円周とn角形の辺の接状態)
+		int[] circumState = pg.classifyCircum(this.circum);
+		int[] sideState = this.classifySide(pg.side);
 
-		condition[0][0] = true;// どちらの可能性もあるのでtrueにする
+		condition[0][0] = true;
 		condition[1][0] = withinRange((circumState[0] + circumState[1]), 1, this.circum.length - 1)
 				&& withinRange(circumState[2], 1, this.circum.length - 1);
 
 		condition[2][0] = withinRange(sideState[0], 1, pg.side.size() - 1)
 				&& withinRange((sideState[1] + sideState[2]), 1, pg.side.size() - 1);
-		condition[2][1] = (sideState[0] == pg.side.size()) && (this.classifyVertex(pg.vertex)[2] > 0);// 特殊な状況の場合(n角形が円に内接すると区別)
-		// (sideState[0] == pg.side.size())のみ、誤判定を除くために別の条件を付与する
+		condition[2][1] = (sideState[0] == pg.side.size()) && (this.classifyVertex(pg.vertex)[2] > 0);
 
 		return (condition[0][0] && condition[1][0] && (condition[2][0] || condition[2][1]));
 	}
 
+	// ☆
 	/**
-	 * 2つの円同士の関係性 <br>
-	 * ①円Bから見た円Aの中心の内外 + 円Aから見た円Bの中心の内外 <br>
-	 * ②2円の中心間の距離で該当する条件 <br>
-	 */
-
-	/**
-	 * ①内側にある + 内外どちらの可能性もある <br>
-	 * ②中心間の距離=円Bの半径-円Aの半径(絶対値は考慮しない) <br>
+	 * 「円Aが円Bの内側で接する」を満たすか否かを判定します。 <br>
+	 * 「円Aが円Bの内側で接する」は二つの円同士の関係性の1つです。
 	 * 
 	 * @param c
-	 * @return
+	 *            対象となる円を表すMyCircleクラス変数
+	 * @return 「円Aが円Bの内側で接する」を満たすか否かを示すboolean型変数
 	 */
-	public boolean inscribeCircle(MyCircle c) {// ca.inscribe(cb) caがcbの中
+	public boolean inscribeCircle(MyCircle c) {
 		boolean[] condition = new boolean[2];
 
 		double centerDist = c.center.calcDistToPoint(this.center);
-		double radiusDiff = c.radius - this.radius;// 絶対値を考慮しない
+		double radiusDiff = c.radius - this.radius;
 
 		condition[0] = c.includePoint(this.center);
-		condition[1] = (radiusDiff >= 0) && (isEqual(centerDist, radiusDiff));// Math.abs(centerDist - radiusDiff) < 10
-		// c.radius - this.radius >= 0 → falseならばreturn false;
+		condition[1] = (radiusDiff >= 0) && (isEqual(centerDist, radiusDiff));
 
 		return (condition[0] && condition[1]);
 	}
 
+	// ☆
 	/**
-	 * ①内側にある + 内外どちらの可能性もある <br>
-	 * ②中心間の距離<円Bの半径-円Aの半径(絶対値は考慮しない) <br>
+	 * 「円Aが円Bの内部に存在する」を満たすか否かを判定します。 <br>
+	 * 「円Aが円Bの内部に存在する」は二つの円同士の関係性の1つです。
 	 * 
 	 * @param c
-	 * @return
+	 *            対象となる円を表すMyCircleクラス変数
+	 * @return 「円Aが円Bの内部に存在する」を満たすか否かを示すboolean型変数
 	 */
 	public boolean insideCircle(MyCircle c) {
 		boolean[] condition = new boolean[2];
 
 		double centerDist = c.center.calcDistToPoint(this.center);
-		double radiusDiff = c.radius - this.radius;// 絶対値を考慮しない
+		double radiusDiff = c.radius - this.radius;
 
 		condition[0] = c.includePoint(this.center);
-		condition[1] = (radiusDiff >= 0) && (isGreater(radiusDiff, centerDist));// 「重なり合う」と被らないための条件
-		// condition[1] = (radiusDiff >= 0) && (Math.abs(centerDist - radiusDiff) >= 10)
-		// && (centerDist < radiusDiff);// 「重なり合う」と被らないための条件
+		condition[1] = (radiusDiff >= 0) && (isGreater(radiusDiff, centerDist));
 
 		return (condition[0] && condition[1]);
 	}
 
+	// ☆
 	/**
-	 * ①外側にある + 外側にある <br>
-	 * ②中心間の距離=円Aの半径+円Bの半径 <br>
+	 * 「円Aと円Bが互いに外接する」を満たすか否かを判定します。 <br>
+	 * 「円Aと円Bが互いに外接する」は二つの円同士の関係性の1つです。
 	 * 
 	 * @param c
-	 * @return
+	 *            対象となる円を表すMyCircleクラス変数
+	 * @return 「円Aと円Bが互いに外接する」を満たすか否かを示すboolean型変数
 	 */
 	public boolean adjoinCircle(MyCircle c) {
 		boolean[] condition = new boolean[2];
@@ -191,17 +212,19 @@ public class MyCircle {
 		double radiusSum = c.radius + this.radius;
 
 		condition[0] = !c.includePoint(this.center) && !this.includePoint(c.center);
-		condition[1] = isEqual(centerDist, radiusSum);// Math.abs(centerDist - radiusSum) < 10
+		condition[1] = isEqual(centerDist, radiusSum);
 
 		return (condition[0] && condition[1]);
 	}
 
+	// ☆
 	/**
-	 * ①内外どちらの可能性もある + 内外どちらの可能性もある <br>
-	 * ②円Bの半径-円Aの半径<中心間の距離<円Aの半径+円Bの半径(絶対値は考慮しない) <br>
+	 * 「円Aと円Bが互いに重なり合う」を満たすか否かを判定します。 <br>
+	 * 「円Aと円Bが互いに重なり合う」は二つの円同士の関係性の1つです。
 	 * 
 	 * @param c
-	 * @return
+	 *            対象となる円を表すMyCircleクラス変数
+	 * @return 「円Aと円Bが互いに重なり合う」を満たすか否かを示すboolean型変数
 	 */
 	public boolean overlapCircle(MyCircle c) {
 		boolean[] condition = new boolean[2];
@@ -212,12 +235,9 @@ public class MyCircle {
 
 		condition[0] = true;
 		condition[1] = (isGreater(centerDist, radiusDiff) && isGreater(radiusSum, centerDist));
-		// (centerDist - radiusDiff) >= 10) && ((radiusSum - centerDist) >= 10
 
 		return (condition[0] && condition[1]);
 	}
-
-	/////////////////////////////////////////////////////////////
 
 	/**
 	 * 円から見たn角形全ての頂点の内外
@@ -232,7 +252,7 @@ public class MyCircle {
 			MyPoint p = vertex.get(i);
 			double dist = this.center.calcDistToPoint(p);
 
-			if (isEqual(this.radius, dist)) {// Math.abs(this.radius - dist) < 10
+			if (isEqual(this.radius, dist)) {
 				vertexState[1]++;
 			} else {
 				if (this.radius > dist) {
@@ -254,12 +274,12 @@ public class MyCircle {
 	public int[] classifySide(ArrayList<MyLine> side) {
 		int[] sideState = new int[3];// 0:円の内側, 1:円に接する, 2:円の外側
 
-		for (int i = 0; i < side.size(); i++) {// a辺が収まっているかどうかは(今は)考慮しないものとする
-			MyLine l = side.get(i);// a線分ではなく直線であることに注意
-			double dist = this.calcDistToLine(l); // こいつを変更する?
+		for (int i = 0; i < side.size(); i++) {
+			MyLine l = side.get(i);
+			double dist = this.calcDistToLine(l);
 
-			if (isEqual(this.radius, dist)) {// Math.abs(this.radius - dist) < 10
-				sideState[1]++;// a接しているの時だけ考えればいいか
+			if (isEqual(this.radius, dist)) {
+				sideState[1]++;
 			} else {
 				if (this.radius > dist) {
 					sideState[0]++;
@@ -303,7 +323,7 @@ public class MyCircle {
 	double calcDistToLine(MyLine l) {
 		MyPoint p = this.center.getPerpendicularFoot(l);
 
-		if (p.withinLineRange(l)) {// 下ろした垂線が線分と交わる場合
+		if (p.withinLineRange(l)) {
 			double numerator = Math.abs(l.a * this.center.x + l.b * this.center.y + l.c);
 			double denominator = Math.hypot(l.a, l.b);
 
@@ -318,16 +338,42 @@ public class MyCircle {
 		return Double.MAX_VALUE;
 	}
 
+	/**
+	 * 
+	 * @param value
+	 * @param min
+	 * @param max
+	 * @return
+	 */
 	private boolean withinRange(int value, int min, int max) {
 		return (min <= value) && (value <= max);
 	}
 
-	private boolean isEqual(double a, double b) {// aとbが等しい
-		return Math.abs(a - b) < 10;// ☆☆☆threshold
+	// ☆
+	/**
+	 * 2つの値が誤差を含めて等しいか否かを判定します。<br>
+	 * 
+	 * @param a
+	 *            1つ目の値を表すdouble型変数
+	 * @param b
+	 *            2つ目の値を表すdouble型変数
+	 * @return 2つの値が誤差を含めて等しいか否かを示すboolean型変数
+	 */
+	private boolean isEqual(double a, double b) {
+		return Math.abs(a - b) < 10;
 	}
 
-	private boolean isGreater(double a, double b) {// aがbより大きい
-		return (a - b) >= 10;// ☆☆☆threshold
+	// ☆
+	/**
+	 * 2つの値のうち、一方の値がもう一方の値より誤差を含めて大きいか否かを判定します。<br>
+	 * 
+	 * @param a
+	 *            大きい方の値を表すdouble型変数
+	 * @param b
+	 *            小さい方の値を表すdouble型変数
+	 * @return 一方の値がもう一方の値より誤差を含めて大きいか否かを示すboolean型変数
+	 */
+	private boolean isGreater(double a, double b) {
+		return (a - b) >= 10;
 	}
 }
-

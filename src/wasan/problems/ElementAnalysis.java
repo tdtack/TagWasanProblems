@@ -3,49 +3,77 @@ package wasan.problems;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+//☆
 /**
- * 和算図形問題に含まれる幾何要素(点・線分・円)、図形要素(n角形・円)の認識に関するクラスです。
- * 幾何要素はHoughTransformクラスを利用して抽出し、図形要素は抽出された幾何要素に基づいて分析されます。
+ * 和算図形問題に含まれる幾何要素(点・線分・円)、図形要素(n角形・円)の認識に関するクラスです。<br>
+ * 幾何要素はHough変換(HoughTransformクラス)を利用して抽出し、図形要素は抽出された幾何要素に基づいて分析されます。
  * 
  * @author Takuma Tsuchihashi
- *
  */
 public class ElementAnalysis {
 
-	/** このクラスでHoughTransformクラスを利用する際に使います。 */
+	// ☆
+	/**
+	 * Hough変換を利用するためのHoughTransformクラス変数です。<br>
+	 * この変数を用いることでHoughTransformクラス内のメソッドなどを呼び出すことができます。
+	 */
 	private HoughTransform houghTrans;
 
+	// ☆以下、図形問題から仮抽出された幾何要素(点・線分・円)を保持するリストです。
 	/**
-	 * 以下、図形問題から仮抽出された幾何要素(点・線分・円)を保持するリストです。
+	 * 図形問題から仮抽出された点を保持します。<br>
+	 * 仮抽出の点を補正した情報はdetectPointに記録されます。
 	 */
-	/** 図形問題から仮抽出された点を保持します。 */
 	public ArrayList<MyPoint> scannedPoint = new ArrayList<MyPoint>();
-	/** 図形問題から仮抽出された線分を保持します。 */
+	/**
+	 * 図形問題から仮抽出された線分を保持します。<br>
+	 * 仮抽出の線分を補正した情報はdetectLineに記録されます。
+	 */
 	public ArrayList<MyLine> scannedLine = new ArrayList<MyLine>();
-	/** 図形問題から抽出された円を保持します。 */
+	/**
+	 * 図形問題から仮抽出された円を保持します。<br>
+	 * 仮抽出の円を補正した情報はdetectCircleに記録されます。
+	 */
 	public ArrayList<MyCircle> scannedCircle = new ArrayList<MyCircle>();
 
+	// ☆以下、図形問題から仮抽出された要素を補正し、確定した幾何要素(点・線分)と図形要素(n角形・円)を保持するリストです。
 	/**
-	 * 以下、仮抽出の要素を補正し、確定した幾何要素(点・線分)と図形要素(n角形・円)を保持するリストです。
+	 * 図形問題から仮抽出された点を補正し、確定した点を保持します。<br>
+	 * 仮抽出の点を保持するscannedPointを補正した情報を記録します。
 	 */
-	/** 仮抽出の点を補正し、確定した点を保持します。 */
 	public ArrayList<MyPoint> detectedPoint = new ArrayList<MyPoint>();
-	/** 仮抽出の線分を補正し、確定した線分を保持します。 */
+	/**
+	 * 図形問題から仮抽出された線分を補正し、確定した線分を保持します。<br>
+	 * 仮抽出の線分を保持するscannedLineを補正した情報を記録します。
+	 */
 	public ArrayList<MyLine> detectedLine = new ArrayList<MyLine>();
-	/** 仮抽出の円を補正し、確定した円を保持します。 */
+	/**
+	 * 図形問題から仮抽出された円を補正し、確定した円を保持します。<br>
+	 * 仮抽出の円を保持するscannedCircleを補正した情報を記録します。
+	 */
 	public ArrayList<MyCircle> detectedCircle = new ArrayList<MyCircle>();
-	/** 確定した点と線分から抽出されたn角形を保持します。 */
+	/**
+	 * 確定した点と線分から分析されたn角形を保持します。<br>
+	 * 補正した点のdetectPoint、線分のdetectLineから認識したn角形を記録します。
+	 */
 	public ArrayList<MyPolygon> detectedPolygon = new ArrayList<MyPolygon>();
 
+	// ☆
 	/**
-	 * ElementAnalysisオブジェクトを作成します。
+	 * Hough変換(HoughTransform)を指定し、要素分析(ElementAnalysis)のインスタンスを生成するコンストラクタです。<br>
 	 * 
 	 * @param houghTrans
+	 *            Hough変換を利用するためのHoughTransformクラス変数
 	 */
 	public ElementAnalysis(HoughTransform _houghTrans) {
 		this.houghTrans = _houghTrans;
 	}
 
+	// ☆
+	/**
+	 * 自動タグ付けが完了した図形問題に関する不要なオブジェクトをメモリから解放します。<br>
+	 * 複数の図形問題に対して連続的に自動タグ付けを行う際、OutOfMemoryErrorを回避します。
+	 */
 	public void freeResource() {
 		houghTrans = null;
 
@@ -59,6 +87,11 @@ public class ElementAnalysis {
 		this.detectedPolygon.clear();
 	}
 
+	// ☆
+	/**
+	 * Hough変換を利用して仮抽出された線分と円に基づき、図形問題から点を仮抽出します。<br>
+	 * また、仮抽出の点の重複について修正を行います。
+	 */
 	public void scanPoint() {// 検出した線分と円から交点を総当たりで検出
 		for (int i = 0; i < this.scannedLine.size(); i++) {// 線分同士の交点の検出
 			for (int j = i + 1; j < this.scannedLine.size(); j++) {
@@ -107,6 +140,17 @@ public class ElementAnalysis {
 		}
 	}
 
+	// ☆
+	/**
+	 * 仮抽出された線分と円に基づき、図形問題から仮抽出された点の重複を修正します。<br>
+	 * 重複はユークリッド距離が近い2点について可能な範囲で修正されます。
+	 * 
+	 * @param index1
+	 *            仮抽出された任意の1点のMyPointクラスリスト内インデックスを表すint型変数
+	 * @param index2
+	 *            任意の1点とのユークリッド距離を測る点のMyPointクラスリスト内インデックス(index2=index1+1とする)を表すint型変数
+	 * @return 仮抽出された点の重複を修正したMyPointクラスリスト
+	 */
 	private ArrayList<MyPoint> organizePoint(int index1, int index2) {
 		for (int i = index2; i < this.scannedPoint.size(); i++) {
 			MyPoint p1 = this.scannedPoint.get(i);
@@ -129,10 +173,19 @@ public class ElementAnalysis {
 				return organizePoint(index1, i);
 			}
 		}
+
 		return this.scannedPoint;
 	}
 
-	public void scanLine(int num) {// 線分の検出
+	// ☆
+	/**
+	 * Hough変換を利用して図形問題から線分を仮抽出します。<br>
+	 * また、仮抽出の線分の端点について修正を行います。
+	 * 
+	 * @param num
+	 *            仮抽出する線分の上限を表すint型変数
+	 */
+	public void scanLine(int num) {
 		for (int i = 0; i < num; i++) {
 			MyLine l1 = this.houghTrans.getFieldLine();
 			MyLine l2 = this.houghTrans.restoreLine(l1.theta, l1.rho);
@@ -143,13 +196,20 @@ public class ElementAnalysis {
 				break;
 			}
 		}
-		this.scannedLine = organizeLine();
+		this.scannedLine = organizeLine();// Hough変換を利用して図形問題から仮抽出された線分の端点を修正します。
 	}
 
+	// ☆
+	/**
+	 * Hough変換を利用して図形問題から仮抽出された線分の端点を修正します。<br>
+	 * 端点は次数が2未満であるものについて可能な範囲で修正されます。
+	 * 
+	 * @return 仮抽出された線分の端点を修正したMyLineクラスリスト
+	 */
 	private ArrayList<MyLine> organizeLine() {
 		for (int i = 0; i < this.scannedLine.size(); i++) {
 			MyLine l1 = this.scannedLine.get(i);
-			
+
 			// 線分上の点に近い場合は置き換え
 			for (int j = i + 1; j < this.scannedLine.size(); j++) {
 				MyLine l2 = this.scannedLine.get(j);
@@ -193,10 +253,18 @@ public class ElementAnalysis {
 				}
 			}
 		}
+
 		return this.scannedLine;
 	}
 
-	public void scanCircle(int num) {// 円の検出
+	// ☆
+	/**
+	 * Hough変換を利用して図形問題から円を仮抽出します。<br>
+	 * 
+	 * @param num
+	 *            仮抽出する円の上限を表すint型変数
+	 */
+	public void scanCircle(int num) {
 		for (int i = 0; i < num; i++) {
 			MyCircle c1 = this.houghTrans.getFieldCircle();
 			MyCircle c2 = this.houghTrans.restoreCircle(c1.center, c1.radius);
@@ -209,6 +277,9 @@ public class ElementAnalysis {
 		}
 	}
 
+	/**
+	 * あああ
+	 */
 	public void relateElement() {
 		relateToPoint1();// ①点から見た関係性(次数)の定義
 		modifyLine();// ②次数が1の線分の調整(両端が1ならば線分ごと削除、片方が1ならば....)
@@ -221,6 +292,9 @@ public class ElementAnalysis {
 		relateToPoint2();// ⑤点と点との関係性
 	}
 
+	/**
+	 * 
+	 */
 	private void relateToPoint1() {// ①点から見た関係性(次数)の定義
 		for (int i = 0; i < this.scannedPoint.size(); i++) {
 			MyPoint p = this.scannedPoint.get(i);
@@ -243,11 +317,17 @@ public class ElementAnalysis {
 		}
 	}
 
+	/**
+	 * 
+	 */
 	private void modifyLine() {// ②次数が1の線分の調整(両端が1ならば線分ごと削除、片方が1ならば....)
 		modifyLine1();// 両端の次数が1の場合
 		modifyLine2();// 片方の次数が1の場合
 	}
 
+	/**
+	 * 
+	 */
 	private void modifyLine1() {
 		for (int i = this.scannedLine.size() - 1; i >= 0; i--) {
 			MyLine l = this.scannedLine.get(i);
@@ -293,6 +373,9 @@ public class ElementAnalysis {
 		}
 	}
 
+	/**
+	 * 
+	 */
 	private void modifyLine2() {
 		for (int i = this.scannedLine.size() - 1; i >= 0; i--) {
 			MyLine l1 = this.scannedLine.get(i);
@@ -356,6 +439,9 @@ public class ElementAnalysis {
 		}
 	}
 
+	/**
+	 * 
+	 */
 	private void modifyPoint() {
 		for (int i = this.scannedPoint.size() - 1; i >= 0; i--) {
 			MyPoint p = this.scannedPoint.get(i);
@@ -367,6 +453,11 @@ public class ElementAnalysis {
 		}
 	}
 
+	/**
+	 * 
+	 * @param p
+	 * @return
+	 */
 	private boolean isEndPoint(MyPoint p) {// 点が線分の端点かどうかの判定
 		for (int i = 0; i < this.scannedLine.size(); i++) {
 			MyLine l = this.scannedLine.get(i);
@@ -377,6 +468,9 @@ public class ElementAnalysis {
 		return false;
 	}
 
+	/**
+	 * 
+	 */
 	private void relateToLine() {
 		for (int i = 0; i < this.scannedLine.size(); i++) {// 点との関連性定義(線分上の点)
 			MyLine l = this.scannedLine.get(i);
@@ -389,6 +483,9 @@ public class ElementAnalysis {
 		}
 	}
 
+	/**
+	 * 
+	 */
 	private void relateToPoint2() {
 		for (int i = 0; i < this.scannedPoint.size(); i++) {
 			MyPoint p1 = this.scannedPoint.get(i);
@@ -404,6 +501,9 @@ public class ElementAnalysis {
 		}
 	}
 
+	/**
+	 * 
+	 */
 	public void detectElement() {// circle→line→pointの順でもいいんでは?
 		detectCircle();
 		detectLine();
@@ -411,24 +511,36 @@ public class ElementAnalysis {
 		detectPolygon();
 	}
 
+	/**
+	 * 
+	 */
 	private void detectCircle() {
 		for (int i = 0; i < this.scannedCircle.size(); i++) {
 			this.detectedCircle.add(this.scannedCircle.get(i));
 		}
 	}
 
+	/**
+	 * 
+	 */
 	private void detectLine() {
 		for (int i = 0; i < this.scannedLine.size(); i++) {
 			this.detectedLine.add(this.scannedLine.get(i));
 		}
 	}
 
+	/**
+	 * 
+	 */
 	private void detectPoint() {
 		for (int i = 0; i < this.scannedPoint.size(); i++) {
 			this.detectedPoint.add(this.scannedPoint.get(i));
 		}
 	}
 
+	/**
+	 * 
+	 */
 	private void detectPolygon() {
 		for (int i = 3; i <= 6; i++) {
 			PolygonAnalysis.generateCombination(this.detectedPoint, new int[i], 0, 1);// 3角形の点候補,4角形の点候補...
@@ -471,6 +583,11 @@ public class ElementAnalysis {
 		}
 	}
 
+	/**
+	 * 
+	 * 
+	 * @author Takuma Tsuchihashi
+	 */
 	private static class PolygonAnalysis {
 
 		/** n角形候補となる点の組み合わせ */
@@ -502,7 +619,7 @@ public class ElementAnalysis {
 
 			if (r.length < plus) {
 				for (int i = 0; i < r.length; i++) {
-					combination[index][i] = r[i];// minReSt[s] = n.get(r[s]).getIndex(n);
+					combination[index][i] = r[i];
 				}
 				index++;
 
@@ -633,7 +750,8 @@ public class ElementAnalysis {
 		}
 
 		static boolean isConvex(ArrayList<MyPoint> pointList, int[] pattern) {
-			int pairNum = 3;// pattern 0 2 3 5 → [0, 2, 3][2, 3, 5][3, 5, 0][5, 0, 2]
+			int pairNum = 3;// pattern 0 2 3 5 → [0, 2, 3][2, 3, 5][3, 5, 0][5,
+							// 0, 2]
 			int[][] pair = generatePair(pattern, pairNum);
 
 			int count = 0;
@@ -769,4 +887,3 @@ public class ElementAnalysis {
 		}
 	}
 }
-
