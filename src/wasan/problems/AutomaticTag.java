@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-//☆
 /**
  * 和算図形問題への自動タグ付け、特徴ベクトル生成に関するクラスです。<br>
  * 画像処理(ImageProcessingクラス)や要素分析(ElementAnalysisクラス)を利用し、図形問題から得られた情報に基づいてタグ付けを行います。
@@ -17,28 +16,25 @@ import java.util.ArrayList;
  */
 public class AutomaticTag {
 
-	// ☆
 	/**
 	 * 画像処理を利用するためのImageProcessingクラス変数です。<br>
 	 * この変数を用いることでImageProcessingクラス内のメソッドなどを呼び出すことができます。
 	 */
 	private ImageProcessing imgProc;
 
-	// ☆
 	/**
 	 * 要素分析を利用するためのElementAnalysisクラス変数です。<br>
 	 * この変数を用いることでElementAnalysisクラス内のメソッドなどを呼び出すことができます。
 	 */
 	private ElementAnalysis elemAnal;
 
-	// ☆
 	/**
 	 * 文字認識を利用するためのCharacterRecognitionクラス変数です。<br>
 	 * この変数を用いることでCharacterRecognitionクラス内のメソッドなどを呼び出すことができます。
 	 */
 	private CharacterRecognition charRec;
 
-	// ☆ 以下、幾何要素のタグを表すString型変数です。
+	// 以下、幾何要素のタグを表すString型変数です。
 	/**
 	 * 幾何要素の「点」のタグを表します。<br>
 	 */
@@ -53,7 +49,7 @@ public class AutomaticTag {
 	 */
 	private String circleTag = "円";
 
-	// ☆ 以下、図形要素(n角形のみ)のタグを表すString型配列です。
+	// 以下、図形要素(n角形のみ)のタグを表すString型配列です。
 	/**
 	 * 図形要素の「n角形」のタグを表します。 <br>
 	 * タグの内容は順に「三角形」「四角形」「五角形」「六角形」です。
@@ -80,7 +76,7 @@ public class AutomaticTag {
 	 */
 	private String[] hexagonTag = { polygonTag[3], "正六角形" };
 
-	// ☆ 以下、図形要素(n角形のみ)のタグの合計を保持するint型配列です。
+	// 以下、図形要素(n角形のみ)のタグの合計を保持するint型配列です。
 	/**
 	 * n角形のうち、特徴的な三角形のタグの合計を保持します。 <br>
 	 * 順に「三角形」「正三角形」「二等辺三角形」「直角三角形」のタグの合計を表します。
@@ -102,7 +98,7 @@ public class AutomaticTag {
 	 */
 	private int[] hexagonNum = new int[hexagonTag.length];
 
-	// ☆ 以下、図形要素同士の関係性のタグを表すString型配列です。(X,Yを置き換えて利用します。)
+	// 以下、図形要素同士の関係性のタグを表すString型配列です。(X,Yを置き換えて利用します。)
 	/**
 	 * 線分と円の交差の関係性のタグを表します。 <br>
 	 * タグの内容は順に「XとYが接する」「XとYが1点で交わる」「XとYが2点で交わる」です。
@@ -129,7 +125,7 @@ public class AutomaticTag {
 	 */
 	private String[] relationCCTag = { "XがYの内側で接する.", "XがYの内部に存在する.", "XとYが互いに外接する.", "XとYが互いに重なり合う." };
 
-	// ☆ 以下、図形要素同士の関係性のタグの合計を保持するint型配列です。
+	// 以下、図形要素同士の関係性のタグの合計を保持するint型配列です。
 	/**
 	 * 線分と円の交差の関係性のタグの合計を保持します。<br>
 	 * 順に「XとYが接する」「XとYが1点で交わる」「XとYが2点で交わる」のタグの合計を表します。
@@ -166,7 +162,6 @@ public class AutomaticTag {
 	 */
 	private int[] relationCCNum2 = new int[2];
 
-	// ☆
 	/**
 	 * 画像処理(ImageProcessing)と要素分析(ElementAnalysis)を指定し、タグ付け(AutomaticTag)のインスタンスを生成するコンストラクタです。<br>
 	 * 
@@ -180,7 +175,6 @@ public class AutomaticTag {
 		this.elemAnal = _elemAnal;
 	}
 
-	// ☆
 	/**
 	 * 自動タグ付けが完了した図形問題に関する不要なオブジェクトをメモリから解放します。<br>
 	 * 複数の図形問題に対して連続的に自動タグ付けを行う際、OutOfMemoryErrorを回避します。
@@ -190,7 +184,6 @@ public class AutomaticTag {
 		this.elemAnal = null;
 	}
 
-	// ☆
 	/**
 	 * 図形問題に付与されたタグの内容をテキストファイルに書き込み、またはコンソールに表示します。<br>
 	 * テキストファイルへの書き込み/コンソールへの表示はWasanMain.java内で切り替えることができます。
@@ -206,7 +199,6 @@ public class AutomaticTag {
 		// printCharacterTag();// 図形問題から文字要素を認識し、タグを付与します。
 	}
 
-	// ☆
 	/**
 	 * 図形問題から図形要素を分析し、タグを付与します。<br>
 	 * また、それぞれのタグの合計を記録します。
@@ -219,7 +211,7 @@ public class AutomaticTag {
 		ArrayList<MyCircle> circleList = this.elemAnal.detectedCircle;
 
 		for (int i = 0; i < polygonList.size(); i++) {
-			String polygonName = polygonList.get(i).getPolygonName();
+			String polygonName = polygonList.get(i).getPolygonName();// n角形の形状を分析し、特徴的なn角形の名称を取得します。
 
 			System.out.print("・ " + polygonTag[polygonList.get(i).vertex.size() - 3] + " > ");
 			System.out.print(polygonName + "(");
@@ -302,7 +294,6 @@ public class AutomaticTag {
 		System.out.println();
 	}
 
-	// ☆
 	/**
 	 * 図形問題から図形要素同士の関係性を分析し、タグを付与します。<br>
 	 * また、それぞれのタグの合計を記録します。
@@ -317,7 +308,6 @@ public class AutomaticTag {
 		System.out.println();
 	}
 
-	// ☆
 	/**
 	 * 図形要素同士の関係性のうち、線分と円の交差の関係性を分析します。<br>
 	 * 分析される関係性は「線分と円が接する」「線分と円が1点で交わる」「線分と円が2点で交わる」です。
@@ -331,18 +321,17 @@ public class AutomaticTag {
 			for (int j = 0; j < lineList.size(); j++) {
 				MyLine l = lineList.get(j);
 
-				if (l.contactCircle(c)) {
+				if (l.contactCircle(c)) {// 線分が円と接するか否かを判定します。
 					relationLCNum[0]++;
-				} else if (l.intersectCircle1(c)) {
+				} else if (l.intersectCircle1(c)) {// 線分が円と交わり、交点が1つ存在するか否かを判定します。
 					relationLCNum[1]++;
-				} else if (l.intersectCircle2(c)) {
+				} else if (l.intersectCircle2(c)) {// 線分が円と交わり、交点が2つ存在するか否かを判定します。
 					relationLCNum[2]++;
 				}
 			}
 		}
 	}
 
-	// ☆
 	/**
 	 * 図形要素同士の関係性のうち、n角形から見た円との関係性を分析し、タグを付与します。<br>
 	 * 分析される関係性は「n角形が円に内接する」「n角形が円の内部に存在する」「n角形と円が互いに隣接する」です。
@@ -357,7 +346,7 @@ public class AutomaticTag {
 			for (int j = 0; j < circleList.size(); j++) {
 				MyCircle c = circleList.get(j);
 
-				String name1 = pg.getPolygonName() + "(";
+				String name1 = pg.getPolygonName() + "(";// n角形の形状を分析し、特徴的なn角形の名称を取得します。
 				for (int k = 0; k < pg.vertex.size(); k++) {
 					name1 += "P[" + pointList.indexOf(pg.vertex.get(k)) + "]";
 				}
@@ -366,21 +355,20 @@ public class AutomaticTag {
 				String name2 = "円(C[" + circleList.indexOf(c) + "])";
 
 				int index = pg.vertex.size() - 3;
-				if (pg.inscribeCircle(c)) {// n角形が円に内接する
-					System.out.println("・ " + setRelationTag(relationPCTag[0], name1, name2));
+				if (pg.inscribeCircle(c)) {// 「n角形が円に内接する」を満たすか否かを判定します。
+					System.out.println("・ " + setRelationTag(relationPCTag[0], name1, name2));// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 					relationPCNum[index][0]++;
-				} else if (pg.insideCircle(c)) {// n角形が円の内部に存在する
-					System.out.println("・ " + setRelationTag(relationPCTag[1], name1, name2));
+				} else if (pg.insideCircle(c)) {// 「n角形が円の内部に存在する」を満たすか否かを判定します。
+					System.out.println("・ " + setRelationTag(relationPCTag[1], name1, name2));// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 					relationPCNum[index][1]++;
-				} else if (pg.adjoinCircle(c)) {// n角形と円が隣接する
-					System.out.println("・ " + setRelationTag(relationPCTag[2], name1, name2));
+				} else if (pg.adjoinCircle(c)) {// 「n角形と円が互いに隣接する」を満たすか否かを判定します。
+					System.out.println("・ " + setRelationTag(relationPCTag[2], name1, name2));// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 					relationPCNum[index][2]++;
 				}
 			}
 		}
 	}
 
-	// ☆
 	/**
 	 * 図形要素同士の関係性のうち、円から見たn角形との関係性を分析し、タグを付与します。<br>
 	 * 分析される関係性は「円がn角形に内接する」「円がn角形の内部に存在する」「円とn角形が互いに重なり合う」です。
@@ -397,28 +385,27 @@ public class AutomaticTag {
 
 				String name1 = "円(C[" + circleList.indexOf(c) + "])";
 
-				String name2 = pg.getPolygonName() + "(";
+				String name2 = pg.getPolygonName() + "(";// n角形の形状を分析し、特徴的なn角形の名称を取得します。
 				for (int k = 0; k < pg.vertex.size(); k++) {
 					name2 += "P[" + pointList.indexOf(pg.vertex.get(k)) + "]";
 				}
 				name2 += ")";
 
 				int index = pg.vertex.size() - 3;
-				if (c.inscribePolygon(pg)) {
-					System.out.println("・ " + setRelationTag(relationCPTag[0], name1, name2));
+				if (c.inscribePolygon(pg)) {// 「円がn角形に内接する」を満たすか否かを判定します。
+					System.out.println("・ " + setRelationTag(relationCPTag[0], name1, name2));// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 					relationCPNum[index][0]++;
-				} else if (c.insidePolygon(pg)) {
-					System.out.println("・ " + setRelationTag(relationCPTag[1], name1, name2));
+				} else if (c.insidePolygon(pg)) {// 「円がn角形の内部に存在する」を満たすか否かを判定します。
+					System.out.println("・ " + setRelationTag(relationCPTag[1], name1, name2));// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 					relationCPNum[index][1]++;
-				} else if (c.overlapPolygon(pg)) {
-					System.out.println("・ " + setRelationTag(relationCPTag[2], name1, name2));
+				} else if (c.overlapPolygon(pg)) {// 「円とn角形が互いに重なり合う」を満たすか否かを判定します。
+					System.out.println("・ " + setRelationTag(relationCPTag[2], name1, name2));// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 					relationCPNum[index][2]++;
 				}
 			}
 		}
 	}
 
-	// ☆
 	/**
 	 * 図形要素同士の関係性のうち、二つのn角形同士の関係性を分析し、タグを付与します。<br>
 	 * 分析される関係性は「n(A)角形がn(B)角形に内接する」「n(A)角形がn(B)角形の内部に存在する」「n(A)角形とn(B)角形が互いに隣接する」「n(A)角形とn(B)角形が互いに重なり合う」です。
@@ -432,13 +419,13 @@ public class AutomaticTag {
 			for (int j = 0; j < polygonList.size(); j++) {
 				MyPolygon pg2 = polygonList.get(j);
 
-				String name1 = pg1.getPolygonName() + "(";
+				String name1 = pg1.getPolygonName() + "(";// n角形の形状を分析し、特徴的なn角形の名称を取得します。
 				for (int k = 0; k < pg1.vertex.size(); k++) {
 					name1 += "P[" + pointList.indexOf(pg1.vertex.get(k)) + "]";
 				}
 				name1 += ")";
 
-				String name2 = pg2.getPolygonName() + "(";
+				String name2 = pg2.getPolygonName() + "(";// n角形の形状を分析し、特徴的なn角形の名称を取得します。
 				for (int k = 0; k < pg2.vertex.size(); k++) {
 					name2 += "P[" + pointList.indexOf(pg2.vertex.get(k)) + "]";
 				}
@@ -446,22 +433,22 @@ public class AutomaticTag {
 
 				if (i != j) {
 					int index = (pg1.vertex.size() - 3) * 4 + (pg2.vertex.size() - 3);
-					if (pg1.inscribePolygon(pg2)) {
-						System.out.println("・ " + setRelationTag(relationPPTag[0], name1, name2));
+					if (pg1.inscribePolygon(pg2)) {// 「n(A)角形がn(B)角形に内接する」を満たすか否かを判定します。
+						System.out.println("・ " + setRelationTag(relationPPTag[0], name1, name2));// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 						relationPPNum1[index][0]++;
-					} else if (pg1.insidePolygon(pg2)) {
-						System.out.println("・ " + setRelationTag(relationPPTag[1], name1, name2));
+					} else if (pg1.insidePolygon(pg2)) {// 「n(A)角形がn(B)角形の内部に存在する」を満たすか否かを判定します。
+						System.out.println("・ " + setRelationTag(relationPPTag[1], name1, name2));// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 						relationPPNum1[index][1]++;
 					}
 				}
 
 				if (i < j) {// 重複させないための工夫
 					int index = (-(pg1.vertex.size() - 4) * (pg1.vertex.size() - 9) + 2 * pg2.vertex.size()) / 2;// 階差数列から得たindex
-					if (pg1.adjoinPolygon(pg2)) {
-						System.out.println("・ " + setRelationTag(relationPPTag[2], name1, name2));
+					if (pg1.adjoinPolygon(pg2)) {// 「n(A)角形とn(B)角形が互いに隣接する」を満たすか否かを判定します。
+						System.out.println("・ " + setRelationTag(relationPPTag[2], name1, name2));// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 						relationPPNum2[index][0]++;
-					} else if (pg1.overlapPolygon(pg2)) {
-						System.out.println("・ " + setRelationTag(relationPPTag[3], name1, name2));
+					} else if (pg1.overlapPolygon(pg2)) {// 「n(A)角形とn(B)角形が互いに重なり合う」を満たすか否かを判定します。
+						System.out.println("・ " + setRelationTag(relationPPTag[3], name1, name2));// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 						relationPPNum2[index][1]++;
 					}
 				}
@@ -469,7 +456,6 @@ public class AutomaticTag {
 		}
 	}
 
-	// ☆
 	/**
 	 * 図形要素同士の関係性のうち、二つの円同士の関係性を分析し、タグを付与します。<br>
 	 * 分析される関係性は「円Aが円Bの内側で接する」「円Aが円Bの内部に存在する」「円Aと円Bが互いに外接する」「円Aと円Bが互いに重なり合う」です。
@@ -486,21 +472,21 @@ public class AutomaticTag {
 				String name2 = "円(C[" + circleList.indexOf(c2) + "])";
 
 				if (i != j) {
-					if (c1.inscribeCircle(c2)) {
-						System.out.println("・ " + setRelationTag(relationCCTag[0], name1, name2));
+					if (c1.inscribeCircle(c2)) {// 「円Aが円Bの内側で接する」を満たすか否かを判定します。
+						System.out.println("・ " + setRelationTag(relationCCTag[0], name1, name2));// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 						relationCCNum1[0]++;
-					} else if (c1.insideCircle(c2)) {
-						System.out.println("・ " + setRelationTag(relationCCTag[1], name1, name2));
+					} else if (c1.insideCircle(c2)) {// 「円Aが円Bの内部に存在する」を満たすか否かを判定します。
+						System.out.println("・ " + setRelationTag(relationCCTag[1], name1, name2));// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 						relationCCNum1[1]++;
 					}
 				}
 
 				if (i < j) {// 重複させないための工夫
-					if (c1.adjoinCircle(c2)) {
-						System.out.println("・ " + setRelationTag(relationCCTag[2], name1, name2));
+					if (c1.adjoinCircle(c2)) {// 「円Aと円Bが互いに外接する」を満たすか否かを判定します。
+						System.out.println("・ " + setRelationTag(relationCCTag[2], name1, name2));// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 						relationCCNum2[0]++;
-					} else if (c1.overlapCircle(c2)) {
-						System.out.println("・ " + setRelationTag(relationCCTag[3], name1, name2));
+					} else if (c1.overlapCircle(c2)) {// 「円Aと円Bが互いに重なり合う」を満たすか否かを判定します。
+						System.out.println("・ " + setRelationTag(relationCCTag[3], name1, name2));// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 						relationCCNum2[1]++;
 					}
 				}
@@ -508,7 +494,6 @@ public class AutomaticTag {
 		}
 	}
 
-	// ☆
 	/**
 	 * 図形問題から文字要素を認識し、タグを付与します。<br>
 	 * このメソッドを実行するには、CharacterRecognition.javaにおいて文字要素を学習させたpbファイルが必要です。
@@ -532,11 +517,11 @@ public class AutomaticTag {
 		try (FileWriter fw = new FileWriter(file, true); BufferedWriter bw = new BufferedWriter(fw)) {
 			PrintWriter pw = new PrintWriter(bw);
 
-			if (imgProc.imgName.equals("001.PNG")) {// 最初だけ行の名前を入れる
-				pw = writeColumnName(pw);
+			if (imgProc.imgName.equals("001.PNG")) {
+				pw = writeColumnName(pw);// 特徴ベクトルの書き込みファイルに要素名を記録します。
 			}
-			pw = writeElementNum(pw);
-			pw = writeRelationNum(pw);
+			pw = writeElementNum(pw);// 特徴ベクトルの書き込みファイルに幾何要素や図形要素のタグの合計を記録します。
+			pw = writeRelationNum(pw);// 特徴ベクトルの書き込みファイルに幾何要素や図形要素同士の関係性のタグの合計を記録します。
 			pw.println();
 
 			pw.close();
@@ -550,9 +535,11 @@ public class AutomaticTag {
 	}
 
 	/**
+	 * 特徴ベクトルの書き込みファイルに要素名を記録します。<br>
 	 * 
 	 * @param pw
-	 * @return
+	 *            書き込む前のファイルを表すPrintWriter型変数
+	 * @return 要素名を記録した書き込みファイルを表すPrintWriter型変数
 	 */
 	private PrintWriter writeColumnName(PrintWriter pw) {
 		pw.print("ファイル名" + ",");
@@ -575,25 +562,25 @@ public class AutomaticTag {
 		pw.print(circleTag + ",");
 
 		for (int i = 0; i < relationLCTag.length; i++) {
-			pw.print("「" + setRelationTag(relationLCTag[i], lineTag, circleTag) + "」" + ",");
+			pw.print("「" + setRelationTag(relationLCTag[i], lineTag, circleTag) + "」" + ",");// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 		}
 
 		for (int i = 0; i < polygonTag.length; i++) {
 			for (int j = 0; j < relationPCTag.length; j++) {
-				pw.print("「" + setRelationTag(relationPCTag[j], polygonTag[i], circleTag) + "」" + ",");
+				pw.print("「" + setRelationTag(relationPCTag[j], polygonTag[i], circleTag) + "」" + ",");// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 			}
 		}
 
 		for (int i = 0; i < polygonTag.length; i++) {
 			for (int j = 0; j < relationCPTag.length; j++) {
-				pw.print("「" + setRelationTag(relationCPTag[j], circleTag, polygonTag[i]) + "」" + ",");
+				pw.print("「" + setRelationTag(relationCPTag[j], circleTag, polygonTag[i]) + "」" + ",");// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 			}
 		}
 
-		for (int i = 0; i < polygonTag.length; i++) {// 4
-			for (int j = 0; j < polygonTag.length; j++) {// 4
+		for (int i = 0; i < polygonTag.length; i++) {
+			for (int j = 0; j < polygonTag.length; j++) {
 				for (int k = 0; k < 2; k++) {
-					pw.print("「" + setRelationTag(relationPPTag[k], polygonTag[i], polygonTag[j]) + "」" + ",");
+					pw.print("「" + setRelationTag(relationPPTag[k], polygonTag[i], polygonTag[j]) + "」" + ",");// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 				}
 			}
 		}
@@ -601,13 +588,13 @@ public class AutomaticTag {
 		for (int i = 0; i < polygonTag.length; i++) {
 			for (int j = i; j < polygonTag.length; j++) {
 				for (int k = 2; k < 4; k++) {
-					pw.print("「" + setRelationTag(relationPPTag[k], polygonTag[i], polygonTag[j]) + "」" + ",");
+					pw.print("「" + setRelationTag(relationPPTag[k], polygonTag[i], polygonTag[j]) + "」" + ",");// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 				}
 			}
 		}
 
 		for (int i = 0; i < relationCCTag.length; i++) {
-			pw.print("「" + setRelationTag(relationCCTag[i], circleTag, circleTag) + "」" + ",");
+			pw.print("「" + setRelationTag(relationCCTag[i], circleTag, circleTag) + "」" + ",");// 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。
 		}
 
 		pw.print("   ");
@@ -617,98 +604,112 @@ public class AutomaticTag {
 	}
 
 	/**
+	 * 特徴ベクトルの書き込みファイルに幾何要素や図形要素のタグの合計を記録します。<br>
+	 * これらの値はタグ毎に定数倍されます。
 	 * 
 	 * @param pw
-	 * @return
+	 *            書き込む前のファイルを表すPrintWriter型変数
+	 * @return 幾何要素や図形要素のタグの合計を記録した書き込みファイルを表すPrintWriter型変数
 	 */
 	private PrintWriter writeElementNum(PrintWriter pw) {
 		pw.print(imgProc.imgName + ",");
 
-		pw.print(calcConstant(this.elemAnal.detectedPoint.size(), 0.5) + ",");
-		pw.print(calcConstant(this.elemAnal.detectedLine.size(), 0.5) + ",");
+		pw.print(calcConstant(this.elemAnal.detectedPoint.size(), 0.5) + ",");// 任意の値を定数倍します。
+		pw.print(calcConstant(this.elemAnal.detectedLine.size(), 0.5) + ",");// 任意の値を定数倍します。
 
 		for (int i = 0; i < triangleNum.length; i++) {
-			pw.print(calcConstant(triangleNum[i], ((i == 0) ? 1 : 2)) + ",");
+			pw.print(calcConstant(triangleNum[i], ((i == 0) ? 1 : 2)) + ",");// 任意の値を定数倍します。
 		}
 
 		for (int i = 0; i < quadrangleNum.length; i++) {
-			pw.print(calcConstant(quadrangleNum[i], ((i == 0) ? 1 : 2)) + ",");
+			pw.print(calcConstant(quadrangleNum[i], ((i == 0) ? 1 : 2)) + ",");// 任意の値を定数倍します。
 		}
 
 		for (int i = 0; i < pentagonNum.length; i++) {
-			pw.print(calcConstant(pentagonNum[i], ((i == 0) ? 1 : 2)) + ",");
+			pw.print(calcConstant(pentagonNum[i], ((i == 0) ? 1 : 2)) + ",");// 任意の値を定数倍します。
 		}
 
 		for (int i = 0; i < hexagonNum.length; i++) {
-			pw.print(calcConstant(hexagonNum[i], ((i == 0) ? 1 : 2)) + ",");
+			pw.print(calcConstant(hexagonNum[i], ((i == 0) ? 1 : 2)) + ",");// 任意の値を定数倍します。
 		}
 
-		pw.print(calcConstant(this.elemAnal.detectedCircle.size(), 1) + ",");
+		pw.print(calcConstant(this.elemAnal.detectedCircle.size(), 1) + ",");// 任意の値を定数倍します。
 
 		return pw;
 	}
 
 	/**
+	 * 特徴ベクトルの書き込みファイルに幾何要素や図形要素同士の関係性のタグの合計を記録します。<br>
+	 * これらの値はタグ毎に定数倍されます。
 	 * 
 	 * @param pw
-	 * @return
+	 *            書き込む前のファイルを表すPrintWriter型変数
+	 * @return 幾何要素や図形要素同士の関係性のタグの合計を記録した書き込みファイルを表すPrintWriter型変数
 	 */
 	private PrintWriter writeRelationNum(PrintWriter pw) {
 		for (int i = 0; i < relationLCNum.length; i++) {
-			pw.print(calcConstant(relationLCNum[i], 2) + ",");
+			pw.print(calcConstant(relationLCNum[i], 2) + ",");// 任意の値を定数倍します。
 		}
 
 		for (int i = 0; i < relationPCNum.length; i++) {
 			for (int j = 0; j < relationPCNum[i].length; j++) {
-				pw.print(calcConstant(relationPCNum[i][j], 3) + ",");
+				pw.print(calcConstant(relationPCNum[i][j], 3) + ",");// 任意の値を定数倍します。
 			}
 		}
 
 		for (int i = 0; i < relationCPNum.length; i++) {
 			for (int j = 0; j < relationCPNum[i].length; j++) {
-				pw.print(calcConstant(relationCPNum[i][j], 3) + ",");
+				pw.print(calcConstant(relationCPNum[i][j], 3) + ",");// 任意の値を定数倍します。
 			}
 		}
 
 		for (int i = 0; i < relationPPNum1.length; i++) {
 			for (int j = 0; j < relationPPNum1[i].length; j++) {
-				pw.print(calcConstant(relationPPNum1[i][j], 3) + ",");
+				pw.print(calcConstant(relationPPNum1[i][j], 3) + ",");// 任意の値を定数倍します。
 			}
 		}
 
 		for (int i = 0; i < relationPPNum2.length; i++) {
 			for (int j = 0; j < relationPPNum2[i].length; j++) {
-				pw.print(calcConstant(relationPPNum2[i][j], 3) + ",");
+				pw.print(calcConstant(relationPPNum2[i][j], 3) + ",");// 任意の値を定数倍します。
 			}
 		}
 
 		for (int i = 0; i < relationCCNum1.length; i++) {
-			pw.print(calcConstant(relationCCNum1[i], 3) + ",");
+			pw.print(calcConstant(relationCCNum1[i], 3) + ",");// 任意の値を定数倍します。
 		}
 
 		for (int i = 0; i < relationCCNum2.length; i++) {
-			pw.print(calcConstant(relationCCNum2[i], 3) + ",");
+			pw.print(calcConstant(relationCCNum2[i], 3) + ",");// 任意の値を定数倍します。
 		}
 
 		return pw;
 	}
 
 	/**
+	 * 図形要素同士の関係性について、要素部分の名詞を補足し、タグを生成します。<br>
+	 * 要素部分の名詞はXとYで表され、これを「n角形」や「円」などの要素名で上書きします。
 	 * 
 	 * @param tag
+	 *            図形要素同士の関係性のタグを表すString型変数(要素部分の名詞はXとYで表されます。)
 	 * @param X
+	 *            要素部分の名詞であるXを上書きする要素名を表すString型変数
 	 * @param Y
-	 * @return
+	 *            要素部分の名詞であるYを上書きする要素名を表すString型変数
+	 * @return 図形要素同士の関係性のタグを表すString型変数(要素部分の名詞は上書きされています。)
 	 */
 	private String setRelationTag(String tag, String X, String Y) {
 		return tag.replace("X", X).replace("Y", Y);
 	}
 
 	/**
+	 * 任意の値を定数倍します。<br>
 	 * 
 	 * @param value
+	 *            定数倍する任意の値を表すint型変数
 	 * @param c
-	 * @return
+	 *            任意の値に乗ずる定数を表すint型変数
+	 * @return 任意の値を定数倍した値を表すint型変数
 	 */
 	private double calcConstant(int value, double c) {
 		return c * (double) value;

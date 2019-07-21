@@ -14,7 +14,7 @@ import java.util.ArrayList;
  */
 public class MyLine {
 
-	// ☆以下、線分の端点を表すMyPointクラス変数です。
+	// 以下、線分の端点を表すMyPointクラス変数です。
 	/**
 	 * 線分の始点を表します。<br>
 	 */
@@ -24,7 +24,7 @@ public class MyLine {
 	 */
 	public MyPoint end;
 
-	// ☆以下、線分または直線をHough変換の定義で表現した際のパラメータを表すdouble型変数です。
+	// 以下、線分または直線をHough変換の定義で表現した際のパラメータを表すdouble型変数です。
 	/**
 	 * 線分または直線に対して、xy平面の原点から引いた法線の長さρを表します。<br>
 	 */
@@ -34,7 +34,7 @@ public class MyLine {
 	 */
 	public double theta;
 
-	// ☆以下、線分または直線をax+by+c=0の方程式で表現した際のパラメータを表すdouble型変数です。
+	// 以下、線分または直線をax+by+c=0の方程式で表現した際のパラメータを表すdouble型変数です。
 	/**
 	 * 線分または直線を示す方程式ax+by+c=0の係数aを表します。<br>
 	 */
@@ -48,7 +48,7 @@ public class MyLine {
 	 */
 	public double c;
 
-	// ☆以下、線分または直線を示す方程式ax+by+c=0のパラメータを正規化した値を表すdouble型変数です。
+	// 以下、線分または直線を示す方程式ax+by+c=0のパラメータを正規化した値を表すdouble型変数です。
 	/**
 	 * 線分または直線を示す方程式ax+by+c=0の係数aを正規化した値です。<br>
 	 */
@@ -62,13 +62,12 @@ public class MyLine {
 	 */
 	public double nc;
 
-	// ☆以下、線分または直線と関係性がある幾何要素(点・線分)を保持するリストです。
+	// 以下、線分または直線と関係性がある幾何要素(点・線分)を保持するリストです。
 	/**
 	 * 線分または直線を通過する(線分と関係性がある)点を保持します。<br>
 	 */
 	public ArrayList<MyPoint> relatedPoint = new ArrayList<MyPoint>();
-
-	// ☆
+	
 	/**
 	 * Hough変換におけるパラメータを指定し、線分または直線のインスタンスを生成するコンストラクタです。<br>
 	 * 
@@ -81,8 +80,7 @@ public class MyLine {
 		theta = _theta;
 		rho = _rho;
 	}
-
-	// ☆
+	
 	/**
 	 * 端点を指定し、線分のインスタンスを生成するコンストラクタです。<br>
 	 * 
@@ -104,8 +102,7 @@ public class MyLine {
 		this.nb = this.b / scalar;
 		this.nc = this.c / scalar;
 	}
-
-	// ☆
+	
 	/**
 	 * 線分が円と接するか否かを判定します。<br>
 	 * 
@@ -123,8 +120,7 @@ public class MyLine {
 		}
 		return false;
 	}
-
-	// ☆
+	
 	/**
 	 * 線分が円と交わり、交点が1つ存在するか否かを判定します。<br>
 	 * intersectCircle2との違いは存在を判定する交点の個数です。
@@ -143,8 +139,7 @@ public class MyLine {
 		}
 		return false;
 	}
-
-	// ☆
+	
 	/**
 	 * 線分が円と交わり、交点が2つ存在するか否かを判定します。<br>
 	 * intersectCircle1との違いは存在を判定する交点の個数です。
@@ -163,8 +158,7 @@ public class MyLine {
 		}
 		return false;
 	}
-
-	// ☆
+	
 	/**
 	 * 線分と点の距離を取得します。<br>
 	 * 
@@ -183,8 +177,7 @@ public class MyLine {
 		}
 		return Double.MAX_VALUE;
 	}
-
-	// ☆
+	
 	/**
 	 * 線分の長さを取得します。<br>
 	 * 
@@ -193,8 +186,7 @@ public class MyLine {
 	public double getLength() {
 		return Math.hypot(Math.abs(start.x - end.x), Math.abs(start.y - end.y));
 	}
-
-	// ☆
+	
 	/**
 	 * 線分が他の線分と交わるか否かを判定します。<br>
 	 * 2本の線分の端点を起点としたベクトルの外積から判定されます。
@@ -215,8 +207,7 @@ public class MyLine {
 
 		return (v1 * v2 <= 0) && (m1 * m2 <= 0);
 	}
-
-	// ☆
+	
 	/**
 	 * 2つの値が誤差を含めて等しいか否かを判定します。<br>
 	 * 
@@ -229,8 +220,7 @@ public class MyLine {
 	private boolean isEqual(double a, double b) {
 		return Math.abs(a - b) < 10;
 	}
-
-	// ☆
+	
 	/**
 	 * 2つの値のうち、一方の値がもう一方の値より誤差を含めて大きいか否かを判定します。<br>
 	 * 

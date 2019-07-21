@@ -11,9 +11,14 @@ import java.io.PrintStream;
 
 import javax.imageio.ImageIO;
 
+/**
+ * 和算図形問題へのタグ付けにおいて、最初に実行されるメソッドを持つクラスです。 <br>
+ * 本クラスのmainメソッドに、図形問題へのタグ付けに関する処理の流れが記述されています。
+ * 
+ * @author Takuma Tsuchihashi
+ */
 public class WasanMain {
-
-	// ☆
+	
 	/**
 	 * 図形問題へのタグ付けにおいて、最初に実行されるメソッドです。<br>
 	 * メソッド内には図形問題に対するタグ付けの過程が記述されています。
@@ -87,8 +92,7 @@ public class WasanMain {
 		System.out.println();
 		System.out.println("complete");
 	}
-
-	// ☆
+	
 	/**
 	 * 図形問題に含まれる幾何要素(点・線分・円)を抽出し、キャンバスに描画したものを画像ファイルとして保存します。<br>
 	 * キャンバスの左側に幾何要素の抽出結果、右側に幾何要素の切り出し結果を表示した状態が保存されます。

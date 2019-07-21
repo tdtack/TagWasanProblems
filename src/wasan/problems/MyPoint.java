@@ -9,7 +9,7 @@ import java.util.ArrayList;
  */
 public class MyPoint {
 
-	// ☆以下、点の座標値を表すint型変数です。
+	// 以下、点の座標値を表すint型変数です。
 	/**
 	 * 点のx座標を表します。<br>
 	 */
@@ -19,7 +19,7 @@ public class MyPoint {
 	 */
 	public double y;
 
-	// ☆以下、点と関係性がある幾何要素(点・線分・円)を保持するリストです。
+	// 以下、点と関係性がある幾何要素(点・線分・円)を保持するリストです。
 	/**
 	 * 点と線分を介して隣り合う(点と関係性がある)点を保持します。<br>
 	 */
@@ -32,8 +32,7 @@ public class MyPoint {
 	 * 点を通過する(点と関係性がある)円を保持します。<br>
 	 */
 	public ArrayList<MyCircle> relatedCircle = new ArrayList<MyCircle>();
-
-	// ☆
+	
 	/**
 	 * 座標値を指定し、点のインスタンスを生成するコンストラクタです。<br>
 	 * 
@@ -46,8 +45,7 @@ public class MyPoint {
 		this.x = _x;
 		this.y = _y;
 	}
-
-	// ☆
+	
 	/**
 	 * 2本の線分または直線同士の交点を取得します。<br>
 	 * 線分同士の交点、直線同士の交点のどちらを取得するかを切り替えることができます。
@@ -73,8 +71,7 @@ public class MyPoint {
 
 		return null;
 	}
-
-	// ☆
+	
 	/**
 	 * 線分と円の交点を取得します。<br>
 	 * 線分と円から発生する2つの交点のうち、1つを選択することができます。
@@ -124,8 +121,7 @@ public class MyPoint {
 		}
 		return null;
 	}
-
-	// ☆
+	
 	/**
 	 * 点が線分上にあるか否かを判定します。<br>
 	 * 
@@ -146,8 +142,7 @@ public class MyPoint {
 		}
 		return false;
 	}
-
-	// ☆
+	
 	/**
 	 * 点が円上にあるか否かを判定します。<br>
 	 * 
@@ -161,8 +156,7 @@ public class MyPoint {
 
 		return isEqual(radius, dist);
 	}
-
-	// ☆
+	
 	/**
 	 * 点から直線に垂線を下ろし、垂線の足に該当する点を取得します。<br>
 	 * 
@@ -181,8 +175,7 @@ public class MyPoint {
 
 		return new MyPoint(x, y);
 	}
-
-	// ☆
+	
 	/**
 	 * 点が線分の2つの端点の間に存在するか否かを判定します。<br>
 	 * 2つの端点それぞれを始点、対象の点を終点とした2つのベクトルの外積から判定されます。
@@ -205,8 +198,7 @@ public class MyPoint {
 
 		return ((v1_x * v2_x + v1_y * v2_y) < 0);
 	}
-
-	// ☆
+	
 	/**
 	 * 2点間の距離を取得します。<br>
 	 * 
@@ -217,8 +209,7 @@ public class MyPoint {
 	public double calcDistToPoint(MyPoint p) {
 		return Math.hypot((this.x - p.x), (this.y - p.y));
 	}
-
-	// ☆
+	
 	/**
 	 * 点と直線の距離を取得します。<br>
 	 * 
@@ -232,8 +223,7 @@ public class MyPoint {
 
 		return numerator / denominator;
 	}
-
-	// ☆
+	
 	/**
 	 * 2つの値が誤差を含めて等しいか否かを判定します。<br>
 	 * 

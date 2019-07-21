@@ -9,7 +9,7 @@ import java.util.ArrayList;
  */
 public class MyPolygon {
 
-	// ☆以下、n角形を構成する要素を表すリスト・変数です。
+	// 以下、n角形を構成する要素を表すリスト・変数です。
 	/**
 	 * n角形の頂点を保持します。<br>
 	 */
@@ -22,7 +22,7 @@ public class MyPolygon {
 	 * n角形の重心を表します。<br>
 	 */
 	public MyPoint centroid;
-
+	
 	/**
 	 * n角形の全ての頂点を指定し、n角形のインスタンスを生成するコンストラクタです。<br>
 	 * 
@@ -49,8 +49,7 @@ public class MyPolygon {
 		centroid.x /= vertex.size();
 		centroid.y /= vertex.size();
 	}
-
-	// ☆
+	
 	/**
 	 * 「n角形が円に内接する」を満たすか否かを判定します。 <br>
 	 * 「n角形が円に内接する」はn角形から見た円との関係性の1つです。
@@ -71,8 +70,7 @@ public class MyPolygon {
 
 		return (condition[0] && condition[1] && condition[2]);
 	}
-
-	// ☆
+	
 	/**
 	 * 「n角形が円の内部に存在する」を満たすか否かを判定します。 <br>
 	 * 「n角形が円の内部に存在する」はn角形から見た円との関係性の1つです。
@@ -94,8 +92,7 @@ public class MyPolygon {
 
 		return (condition[0] && condition[1] && condition[2]);
 	}
-
-	// ☆
+	
 	/**
 	 * 「n角形と円が互いに隣接する」を満たすか否かを判定します。 <br>
 	 * 「n角形と円が互いに隣接する」はn角形から見た円との関係性の1つです。
@@ -120,8 +117,7 @@ public class MyPolygon {
 
 		return (condition[0][0] && ((condition[1][0] && condition[2][0]) || (condition[1][1] && condition[2][1])));
 	}
-
-	// ☆
+	
 	/**
 	 * 「n(A)角形がn(B)角形に内接する」を満たすか否かを判定します。 <br>
 	 * 「n(A)角形がn(B)角形に内接する」は二つのn角形同士の関係性の1つです。
@@ -140,8 +136,7 @@ public class MyPolygon {
 
 		return (condition[0] && condition[1]);
 	}
-
-	// ☆
+	
 	/**
 	 * 「n(A)角形がn(B)角形の内部に存在する」を満たすか否かを判定します。 <br>
 	 * 「n(A)角形がn(B)角形の内部に存在する」は二つのn角形同士の関係性の1つです。
@@ -161,8 +156,7 @@ public class MyPolygon {
 
 		return (condition[0] && condition[1]);
 	}
-
-	// ☆
+	
 	/**
 	 * 「n(A)角形とn(B)角形が互いに隣接する」を満たすか否かを判定します。 <br>
 	 * 「n(A)角形とn(B)角形が互いに隣接する」は二つのn角形同士の関係性の1つです。
@@ -185,8 +179,7 @@ public class MyPolygon {
 
 		return (condition[0][0] && (condition[1][0] || condition[1][1]));
 	}
-
-	// ☆
+	
 	/**
 	 * 「n(A)角形とn(B)角形が互いに重なり合う」を満たすか否かを判定します。 <br>
 	 * 「n(A)角形とn(B)角形が互いに重なり合う」は二つのn角形同士の関係性の1つです。
@@ -209,12 +202,14 @@ public class MyPolygon {
 
 		return (condition[0][0] && (condition[1][0] && condition[1][1]));
 	}
-
+	
 	/**
-	 * n角形から見た円の分割点の内外
+	 * n角形に対する円周上の8点の状態を記録します。<br>
+	 * 記録される状態は「円周上の点がn角形の内部にある」「円周上の点がn角形上にある」「円周上の点がn角形の外部にある」です。
 	 * 
 	 * @param circum
-	 * @return
+	 *            円周上の8点を表すMyPointクラス配列
+	 * @return n角形に対する円周上の8点の状態を保持するint型配列
 	 */
 	public int[] classifyCircum(MyPoint[] circum) {
 		int[] circumState = new int[3];// 0:内側, 1:頂点に一致or辺に接する, 2:外側
@@ -234,12 +229,14 @@ public class MyPolygon {
 		}
 		return circumState;
 	}
-
+	
 	/**
-	 * n角形Xから見たn角形Yの全ての頂点の(一致,辺に接する数)または内外
+	 * n(A)角形に対するn(B)角形の全ての頂点の状態を記録します。<br>
+	 * 記録される状態は「頂点がn(A)角形の内部にある」「頂点がn(A)角形上にある」「頂点がn(A)角形の外部にある」です。
 	 * 
 	 * @param vertex
-	 * @return
+	 *            n(B)角形の頂点を保持するMyPointクラスリスト
+	 * @return 頂点の状態を保持するint型配列
 	 */
 	public int[] classifyVertex(ArrayList<MyPoint> vertex) {
 		int[] vertexState = new int[3];// 0:内側, 1:頂点に一致or辺に接する, 2:外側
@@ -259,12 +256,13 @@ public class MyPolygon {
 		}
 		return vertexState;
 	}
-
+	
 	/**
-	 * 点がn角形のいずれかの点に合致するか
+	 * n角形に対して点が頂点と合致するか否かを判定します。<br>
 	 * 
 	 * @param p
-	 * @return
+	 *            対象となる点を表すMyPointクラス変数
+	 * @return n角形に対して点が頂点と合致するか否かを示すboolean型変数
 	 */
 	private boolean matchVertex(MyPoint p) {
 		for (int i = 0; i < this.vertex.size(); i++) {
@@ -274,12 +272,13 @@ public class MyPolygon {
 		}
 		return false;
 	}
-
+	
 	/**
-	 * 点がn角形のいずれかの辺の上にあるか
+	 * n角形に対して点が辺上に存在するか否かを判定します。<br>
 	 * 
 	 * @param p
-	 * @return
+	 *            対象となる点を表すMyPointクラス変数
+	 * @return n角形に対して点が辺上に存在するか否かを示すboolean型変数
 	 */
 	private boolean isOnSide(MyPoint p) {
 		for (int i = 0; i < this.side.size(); i++) {
@@ -289,12 +288,13 @@ public class MyPolygon {
 		}
 		return false;
 	}
-
+	
 	/**
-	 * 点の内外
+	 * n角形に対して点が内部に含まれるか否かを判定します。<br>
 	 * 
 	 * @param p
-	 * @return
+	 *            対象となる点を表すMyPointクラス変数
+	 * @return n角形に対して点が内部に含まれるか否かを示すboolean型変数
 	 */
 	public boolean includePoint(MyPoint p) {
 		int crossNum = countCrossNum(this.vertex, p);
@@ -302,12 +302,16 @@ public class MyPolygon {
 
 		return (crossNum % 2 == 1) && (windNum != 0);
 	}
-
+	
 	/**
+	 * 交差数に基づいて、n角形に対して点が内部に含まれるか否かを判定します。<br>
+	 * 交差数とは、任意の点から引いた半直線がn角形の辺と交差する回数を表します。
 	 * 
 	 * @param pointList
+	 *            n角形の頂点を保持するMyPointクラスリスト
 	 * @param p
-	 * @return
+	 *            対象となる点を表すMyPointクラス変数
+	 * @return 交差数に基づいて、n角形に対して点が内部に含まれるか否かを示すboolean型変数
 	 */
 	private int countCrossNum(ArrayList<MyPoint> pointList, MyPoint p) {
 		int crossNum = 0;
@@ -328,12 +332,16 @@ public class MyPolygon {
 
 		return crossNum;
 	}
-
+	
 	/**
+	 * 回転数に基づいて、n角形に対して点が内部に含まれるか否かを判定します。<br>
+	 * 回転数とは、n角形によって構成される閉路が任意の点の周りを周る回数を表します。
 	 * 
 	 * @param pointList
+	 *            n角形の頂点を保持するMyPointクラスリスト
 	 * @param p
-	 * @return
+	 *            対象となる点を表すMyPointクラス変数
+	 * @return 回転数に基づいて、n角形に対して点が内部に含まれるか否かを示すboolean型変数
 	 */
 	private int countWindNum(ArrayList<MyPoint> pointList, MyPoint p) {
 		int windNum = 0;
@@ -359,21 +367,27 @@ public class MyPolygon {
 
 		return windNum;
 	}
-
+	
 	/**
+	 * ある値が指定した範囲内の値であるか否かを判定します。<br>
 	 * 
 	 * @param value
+	 *            対象となる値を表すint型変数
 	 * @param min
+	 *            指定する範囲の最小値を表すint型変数
 	 * @param max
-	 * @return
+	 *            指定する範囲の最大値を表すint型変数
+	 * @return ある値が指定した範囲内の値であるか否かを示すboolean型変数
 	 */
 	private boolean withinRange(int value, int min, int max) {
 		return (min <= value) && (value <= max);
 	}
-
+	
 	/**
+	 * n角形の形状を分析し、特徴的なn角形の名称を取得します。<br>
+	 * 特徴的なn角形は「正三角形」や「正方形」などを指します。
 	 * 
-	 * @return
+	 * @return 特徴的なn角形の名称を表すString型変数
 	 */
 	public String getPolygonName() {
 		switch (this.vertex.size()) {
@@ -385,10 +399,12 @@ public class MyPolygon {
 			return getGonName();
 		}
 	}
-
+	
 	/**
+	 * 三角形の形状を分析し、特徴的な三角形の名称を取得します。<br>
+	 * 特徴的な三角形は「正三角形」「二等辺三角形」「直角三角形」を指します。
 	 * 
-	 * @return
+	 * @return 特徴的な三角形の名称を表すString型変数
 	 */
 	public String getTriangleName() {
 		boolean[][] condition = new boolean[2][3];
@@ -407,16 +423,18 @@ public class MyPolygon {
 			if (condition[0][0] || condition[0][1] || condition[0][2]) {
 				return "二等辺三角形";
 			} else if (condition[1][0] || condition[1][1] || condition[1][2]) {
-				return "直角三角形";//
+				return "直角三角形";
 			}
 		}
 
 		return "三角形";
 	}
-
+	
 	/**
+	 * 四角形の形状を分析し、特徴的な四角形の名称を取得します。<br>
+	 * 特徴的な四角形は「正方形」「長方形」「菱形」「等脚台形」を指します。
 	 * 
-	 * @return
+	 * @return 特徴的な四角形の名称を表すString型変数
 	 */
 	public String getQuadrangleName() {
 		boolean[][] condition = new boolean[3][4];
@@ -434,13 +452,13 @@ public class MyPolygon {
 
 		if (isSameLength(side.get(0), side.get(1), side.get(2), side.get(3))) {
 			if (condition[1][0] && condition[1][1] && condition[1][2] && condition[1][3]) {
-				return "正方形";//
+				return "正方形";
 			} else if (condition[2][0] && condition[2][1]) {
 				return "菱形";
 			}
 		} else {
 			if (condition[1][0] && condition[1][1] && condition[1][2] && condition[1][3]) {
-				return "長方形";//
+				return "長方形";
 			} else if ((condition[0][0] && condition[2][1]) || (condition[0][1] && condition[2][0])) {
 				return "等脚台形";
 			}
@@ -448,10 +466,12 @@ public class MyPolygon {
 
 		return "四角形";
 	}
-
+	
 	/**
+	 * 五角形や六角形の形状を分析し、特徴的な五角形や六角形の名称を取得します。<br>
+	 * 特徴的な五角形は「正五角形」、特徴的な六角形は「正六角形」を指します。
 	 * 
-	 * @return
+	 * @return 特徴的な五角形や六角形の名称を表すString型変数
 	 */
 	public String getGonName() {
 		if (this.vertex.size() == 5) {
@@ -466,24 +486,28 @@ public class MyPolygon {
 			return "六角形";
 		}
 	}
-
+	
 	/**
+	 * n角形が特徴的であるか否かを判定します。 <br>
+	 * 特徴的であるとは、n角形が「正三角形」や「正方形」などを条件を満たすことを指します。
 	 * 
-	 * @return
+	 * @return n角形が特徴的であるか否かを示すboolean型変数
 	 */
 	public boolean hasFeature() {
-		String polygonName = getPolygonName();
+		String polygonName = getPolygonName();// n角形の形状を分析し、特徴的なn角形の名称を取得します。
 		String[] polygon = { "三角形", "四角形", "五角形", "六角形" };
 
 		return !(polygonName.equals(polygon[vertex.size() - 3]));
 	}
-
+	
 	/**
+	 * 複数の線分の長さが誤差を含めて等しいか否かを判定します。<br>
 	 * 
 	 * @param l
-	 * @return
+	 *            複数の線分を表すMyLineクラス変数(比較する全ての線分を順に引数とします。)
+	 * @return 複数の線分の長さが誤差を含めて等しいか否かを示すboolean型変数
 	 */
-	private boolean isSameLength(MyLine... l) {//
+	private boolean isSameLength(MyLine... l) {
 		double[] lengthRatio = new double[l.length];
 
 		double totalLength = 0;
@@ -506,12 +530,15 @@ public class MyPolygon {
 
 		return (count == l.length);
 	}
-
+	
 	/**
+	 * 2本の線分が誤差を含めて平行であるか否かを判定します。<br>
 	 * 
 	 * @param l1
+	 *            1本目の線分を表すMyLineクラス変数
 	 * @param l2
-	 * @return
+	 *            2本目の線分を表すMyLineクラス変数
+	 * @return 2本の線分が誤差を含めて平行であるか否かを示すboolean型変数
 	 */
 	private boolean isParallel(MyLine l1, MyLine l2) {
 		if (!l1.intersectLine(l2)) {
@@ -521,12 +548,15 @@ public class MyPolygon {
 		}
 		return false;
 	}
-
+	
 	/**
+	 * 2本の線分が誤差を含めて垂直であるか否かを判定します。<br>
 	 * 
 	 * @param l1
+	 *            1本目の線分を表すMyLineクラス変数
 	 * @param l2
-	 * @return
+	 *            2本目の線分を表すMyLineクラス変数
+	 * @return 2本の線分が誤差を含めて垂直であるか否かを示すboolean型変数
 	 */
 	private boolean isPerpendicular(MyLine l1, MyLine l2) {
 		if (l1.intersectLine(l2)) {

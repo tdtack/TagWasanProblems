@@ -9,7 +9,6 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
-//☆
 /**
  * 和算図形問題の画像を分析する際に利用する画像処理に関するクラスです。<br>
  * 図形問題画像の二値化やクロージング処理など、画像処理のメソッドは主にこのクラスから利用します。
@@ -18,7 +17,7 @@ import javax.imageio.ImageIO;
  */
 public class ImageProcessing {
 
-	// ☆以下、入力とする図形問題の画像ファイル名に関するString型変数です。
+	// 以下、入力とする図形問題の画像ファイル名に関するString型変数です。
 	/**
 	 * 入力とする図形問題の画像ファイル名を表します。<br>
 	 * 画像ファイル名は"001.PNG","002.PNG",...のように設定するものとします。
@@ -30,7 +29,7 @@ public class ImageProcessing {
 	 */
 	public String imgNum;
 
-	// ☆以下、画像処理で扱われる画像を表すBufferedImage型変数です。
+	// 以下、画像処理で扱われる画像を表すBufferedImage型変数です。
 	/**
 	 * 入力とする図形問題の元画像を表します。<br>
 	 */
@@ -48,7 +47,6 @@ public class ImageProcessing {
 	 */
 	public BufferedImage characterImg;
 
-	// ☆
 	/**
 	 * 図形問題の画像ファイルパスを指定し、画像処理(ImageProcessing)のインスタンスを生成するコンストラクタです。<br>
 	 * 
@@ -66,13 +64,11 @@ public class ImageProcessing {
 		originalImg = loadImage(filePath);// 入力とする図形問題の画像ファイルパスから画像を読み込みます。
 		originalImg = resizeImage(500);// 読み込んだ図形問題の元画像をリサイズします。
 
-		// 以下、図形問題への自動タグ付け前に画像に対する事前処理を行います。
-		editingImg = preprocessImage(true);
-		elementImg = preprocessImage(false);
-		characterImg = preprocessImage(false);
+		editingImg = preprocessImage(true);// 図形問題への自動タグ付け前に画像に対する事前処理を行います。
+		elementImg = preprocessImage(false);// 図形問題への自動タグ付け前に画像に対する事前処理を行います。
+		characterImg = preprocessImage(false);// 図形問題への自動タグ付け前に画像に対する事前処理を行います。
 	}
 
-	// ☆
 	/**
 	 * 自動タグ付けが完了した図形問題に関する不要なオブジェクトをメモリから解放します。<br>
 	 * 複数の図形問題に対して連続的に自動タグ付けを行う際、OutOfMemoryErrorを回避します。
@@ -84,7 +80,6 @@ public class ImageProcessing {
 		this.characterImg.flush();
 	}
 
-	// ☆
 	/**
 	 * 入力とする図形問題の画像ファイルパスから画像を読み込みます。<br>
 	 * 
@@ -102,7 +97,6 @@ public class ImageProcessing {
 		}
 	}
 
-	// ☆
 	/**
 	 * 読み込んだ図形問題の元画像をリサイズします。<br>
 	 * 元画像の縦幅と横幅のうち、長い方を基準にリサイズを行います。
@@ -136,7 +130,6 @@ public class ImageProcessing {
 		return outputImg;
 	}
 
-	// ☆
 	/**
 	 * 図形問題への自動タグ付け前に画像に対する事前処理を行います。<br>
 	 * ここで行われる処理はグレースケール化・二値化・クロージング処理の3つです。
@@ -150,12 +143,12 @@ public class ImageProcessing {
 
 		outputImg = grayscaleImage(outputImg);// 図形問題の画像に対するグレースケール化を行います。
 		outputImg = binarizeImage(outputImg);// 図形問題の画像に対する二値化を行います。
-		outputImg = (closing) ? closeImage(outputImg) : outputImg;// 図形問題の画像に対するクロージング処理を行います。(closingがtrue→実行する、false→実行しない)
+		outputImg = (closing) ? closeImage(outputImg) : outputImg;// 図形問題の画像に対するクロージング処理を行います。(closing=true:実行する,
+																	// false:実行しない)
 
 		return outputImg;
 	}
 
-	// ☆
 	/**
 	 * 図形問題の画像に対するグレースケール化を行います。<br>
 	 * 
@@ -176,7 +169,6 @@ public class ImageProcessing {
 		return outputImg;
 	}
 
-	// ☆
 	/**
 	 * 図形問題の画像に対する二値化を行います。<br>
 	 * 
@@ -191,14 +183,13 @@ public class ImageProcessing {
 		for (int y = 0; y < inputImg.getHeight(); y++) {
 			for (int x = 0; x < inputImg.getWidth(); x++) {
 				int color = ((inputImg.getRGB(x, y) & 0xFF) > 128) ? 255 : 0;
-				outputImg.setRGB(x, y, intRGB(color));
+				outputImg.setRGB(x, y, intRGB(color));// 8bitで指定したRGB値(0～255)を32bitデータに変換します。
 			}
 		}
 
 		return outputImg;
 	}
 
-	// ☆
 	/**
 	 * 図形問題の画像に対するクロージング処理を行います。<br>
 	 * クロージング処理は、dilateImageとerodeImageを併用します。
@@ -209,17 +200,15 @@ public class ImageProcessing {
 	 */
 	public BufferedImage closeImage(BufferedImage inputImg) {
 		BufferedImage outputImg = inputImg;
-		
-		// https://algorithm.joho.info/image-processing/dilation-erosion-opening-closing-tophat-blackhat/
+
 		int kernelSize = 5;
 		int iteration = 2;
-		outputImg = dilateImage(outputImg, kernelSize, iteration);// 図形問題の画像に対するクロージング処理を行います。
+		outputImg = dilateImage(outputImg, kernelSize, iteration);// 図形問題の画像のクロージング処理における膨張処理を実行します。
 		outputImg = erodeImage(outputImg, kernelSize, iteration);// 図形問題の画像のクロージング処理における収縮処理を実行します。
 
 		return outputImg;
 	}
 
-	// ☆
 	/**
 	 * 図形問題の画像のクロージング処理における膨張処理を実行します。<br>
 	 * クロージング処理では、このメソッドとerodeImageを併用します。
@@ -241,9 +230,9 @@ public class ImageProcessing {
 		for (int y = 0; y < inputImg.getHeight(); y++) {
 			for (int x = 0; x < inputImg.getWidth(); x++) {
 				if (x < d || x >= inputImg.getWidth() - d) {
-					outputImg.setRGB(x, y, intRGB(255));
+					outputImg.setRGB(x, y, intRGB(255));// 8bitで指定したRGB値(0～255)を32bitデータに変換します。
 				} else if (y < d || y >= inputImg.getHeight() - d) {
-					outputImg.setRGB(x, y, intRGB(255));
+					outputImg.setRGB(x, y, intRGB(255));// 8bitで指定したRGB値(0～255)を32bitデータに変換します。
 				} else {
 					int blackCount = 0;
 					for (int dy = -d; dy <= d; dy++) {
@@ -254,15 +243,16 @@ public class ImageProcessing {
 						}
 					}
 
-					outputImg.setRGB(x, y, (blackCount > 0) ? intRGB(0) : intRGB(255));
+					outputImg.setRGB(x, y, (blackCount > 0) ? intRGB(0) : intRGB(255));// 8bitで指定したRGB値(0～255)を32bitデータに変換します。
 				}
 			}
 		}
 
 		return (iteration > 1) ? dilateImage(outputImg, kernelSize, iteration - 1) : outputImg;
+		// 図形問題の画像のクロージング処理における膨張処理を実行します。((iteration > 1)=true:実行する,
+		// false:実行しない)
 	}
 
-	// ☆
 	/**
 	 * 図形問題の画像のクロージング処理における収縮処理を実行します。<br>
 	 * クロージング処理では、このメソッドとdilateImageを併用します。
@@ -284,9 +274,9 @@ public class ImageProcessing {
 		for (int y = 0; y < inputImg.getHeight(); y++) {
 			for (int x = 0; x < inputImg.getWidth(); x++) {
 				if (x < d || x >= inputImg.getWidth() - d) {
-					outputImg.setRGB(x, y, intRGB(255));
+					outputImg.setRGB(x, y, intRGB(255));// 8bitで指定したRGB値(0～255)を32bitデータに変換します。
 				} else if (y < d || y >= inputImg.getHeight() - d) {
-					outputImg.setRGB(x, y, intRGB(255));
+					outputImg.setRGB(x, y, intRGB(255));// 8bitで指定したRGB値(0～255)を32bitデータに変換します。
 				} else {
 					int whiteCount = 0;
 					for (int dy = -d; dy <= d; dy++) {
@@ -297,15 +287,16 @@ public class ImageProcessing {
 						}
 					}
 
-					outputImg.setRGB(x, y, (whiteCount > 0) ? intRGB(255) : intRGB(0));
+					outputImg.setRGB(x, y, (whiteCount > 0) ? intRGB(255) : intRGB(0));// 8bitで指定したRGB値(0～255)を32bitデータに変換します。
 				}
 			}
 		}
 
 		return (iteration > 1) ? erodeImage(outputImg, kernelSize, iteration - 1) : outputImg;
+		// 図形問題の画像のクロージング処理における収縮処理を実行します。((iteration > 1)=true:実行する,
+		// false:実行しない)
 	}
 
-	// ☆
 	/**
 	 * 図形問題の画像から抽出された線分を除去します。<br>
 	 * この除去は他の幾何要素の誤検出を軽減することを目的としています。
@@ -314,13 +305,13 @@ public class ImageProcessing {
 	 *            抽出された線分を保持するMyLineクラスリスト
 	 * @return 抽出された線分を除去した図形問題の画像を表すBufferedImage型変数
 	 */
-	public BufferedImage removeLine(ArrayList<MyLine> lineList) {// 線分要素の除去
+	public BufferedImage removeLine(ArrayList<MyLine> lineList) {
 		for (int y = 0; y < editingImg.getHeight(); y++) {
 			for (int x = 0; x < editingImg.getWidth(); x++) {
 				if ((editingImg.getRGB(x, y) & 0xFF) == 0) {
 					for (int i = 0; i < lineList.size(); i++) {
-						if (lineList.get(i).calcDistToPoint(new MyPoint(x, y)) < 3) {
-							editingImg.setRGB(x, y, intRGB(255));
+						if (lineList.get(i).calcDistToPoint(new MyPoint(x, y)) < 3) {// 線分と点の距離を取得します。
+							editingImg.setRGB(x, y, intRGB(255));// 8bitで指定したRGB値(0～255)を32bitデータに変換します。
 						}
 					}
 				}
@@ -330,7 +321,6 @@ public class ImageProcessing {
 		return editingImg;
 	}
 
-	// ☆
 	/**
 	 * 図形問題の画像から抽出した円を除去します。<br>
 	 * この除去は他の幾何要素の誤検出を軽減することを目的としています。
@@ -339,13 +329,13 @@ public class ImageProcessing {
 	 *            抽出された円を保持するMyCircleクラスリスト
 	 * @return 抽出された円を除去した図形問題の画像を表すBufferedImage型変数
 	 */
-	public BufferedImage removeCircle(ArrayList<MyCircle> circleList) {// 円要素の除去
+	public BufferedImage removeCircle(ArrayList<MyCircle> circleList) {
 		for (int y = 0; y < editingImg.getHeight(); y++) {
 			for (int x = 0; x < editingImg.getWidth(); x++) {
 				if ((editingImg.getRGB(x, y) & 0xFF) == 0) {
 					for (int i = 0; i < circleList.size(); i++) {
-						if (circleList.get(i).calcDistToPoint(new MyPoint(x, y)) < 3) {
-							editingImg.setRGB(x, y, intRGB(255));
+						if (circleList.get(i).calcDistToPoint(new MyPoint(x, y)) < 3) {// 円周と点との距離を取得します。
+							editingImg.setRGB(x, y, intRGB(255));// 8bitで指定したRGB値(0～255)を32bitデータに変換します。
 						}
 					}
 				}
@@ -355,7 +345,6 @@ public class ImageProcessing {
 		return editingImg;
 	}
 
-	// ☆
 	/**
 	 * 図形問題に含まれる幾何要素を抽出した画像および文字要素を抽出した画像を生成します。<br>
 	 * これらの2つの画像の和は図形問題の元画像に等しいです。
@@ -373,8 +362,8 @@ public class ImageProcessing {
 			for (int x = 0; x < characterImg.getWidth(); x++) {
 				if ((characterImg.getRGB(x, y) & 0xFF) == 0) {
 					for (int i = 0; i < circleList.size(); i++) {
-						if (circleList.get(i).calcDistToPoint(new MyPoint(x, y)) < 6) {
-							characterImg.setRGB(x, y, intRGB(255));
+						if (circleList.get(i).calcDistToPoint(new MyPoint(x, y)) < 6) {// 円周と点との距離を取得します。
+							characterImg.setRGB(x, y, intRGB(255));// 8bitで指定したRGB値(0～255)を32bitデータに変換します。
 						}
 					}
 				}
@@ -385,8 +374,8 @@ public class ImageProcessing {
 			for (int x = 0; x < characterImg.getWidth(); x++) {
 				if ((characterImg.getRGB(x, y) & 0xFF) == 0) {
 					for (int i = 0; i < lineList.size(); i++) {
-						if (lineList.get(i).calcDistToPoint(new MyPoint(x, y)) < 6) {
-							characterImg.setRGB(x, y, intRGB(255));
+						if (lineList.get(i).calcDistToPoint(new MyPoint(x, y)) < 6) {// 線分と点の距離を取得します。
+							characterImg.setRGB(x, y, intRGB(255));// 8bitで指定したRGB値(0～255)を32bitデータに変換します。
 						}
 					}
 				}
@@ -396,7 +385,7 @@ public class ImageProcessing {
 		for (int y = 0; y < elementImg.getHeight(); y++) {
 			for (int x = 0; x < elementImg.getWidth(); x++) {
 				if ((characterImg.getRGB(x, y) & 0xFF) == 0) {
-					elementImg.setRGB(x, y, intRGB(255));
+					elementImg.setRGB(x, y, intRGB(255));// 8bitで指定したRGB値(0～255)を32bitデータに変換します。
 				}
 			}
 		}
@@ -407,7 +396,6 @@ public class ImageProcessing {
 		return imgArray;
 	}
 
-	// ☆
 	/**
 	 * 図形問題に含まれる文字要素を抽出した画像にラベリングを行い、文字要素を切り出します。<br>
 	 * 
@@ -588,7 +576,6 @@ public class ImageProcessing {
 		return characterList;
 	}
 
-	// ☆
 	/**
 	 * 図形問題から切り出した文字要素を回転させた画像を生成します。<br>
 	 * 文字要素1つに対し、回転で生成される画像の枚数は回転角度により決定します。
@@ -629,7 +616,7 @@ public class ImageProcessing {
 						BufferedImage.TYPE_BYTE_GRAY);
 				for (int y = 0; y < character.getHeight(); y++) {
 					for (int x = 0; x < character.getWidth(); x++) {
-						character.setRGB(x, y, intRGB(255));
+						character.setRGB(x, y, intRGB(255));// 8bitで指定したRGB値(0～255)を32bitデータに変換します。
 					}
 				}
 
@@ -665,9 +652,12 @@ public class ImageProcessing {
 	}
 
 	/**
+	 * 8bitで指定したRGB値(0～255)を32bitデータに変換します。<br>
 	 * 
 	 * @param color
-	 * @return
+	 *            引数が1つ(C)の場合:(R,G,B)=(C,C,C) /
+	 *            引数が3つ(C1,C2,C3)の場合:(R,G,B)=(C1,C2,C3)
+	 * @return 32bitデータに変換されたRGB値を表すint型変数
 	 */
 	public int intRGB(int... color) {
 		if (color.length == 1) {
@@ -679,8 +669,10 @@ public class ImageProcessing {
 	}
 
 	/**
+	 * 処理中に何らかの例外が発生した際、その詳細を表示します。<br>
 	 * 
 	 * @param e
+	 *            例外の内容を表すException型変数
 	 */
 	private void showException(Exception e) {
 		StackTraceElement[] ste = e.getStackTrace();

@@ -89,11 +89,11 @@ public class CharacterRecognition {
 	 * @param imageFiles
 	 *            図形問題から切り出した各々の文字要素の回転画像を保持するBufferedImage型配列
 	 */
-	private void printBestResult(BufferedImage[][] imageFiles) {// result
+	private void printBestResult(BufferedImage[][] imageFiles) {
 		String dir = "dat/input/ocr";
 
-		byte[] graphDef = readAllBytesOrExit(Paths.get(dir, "wasan_model_09091142.pb")); // pbファイル読み込み
-		List<String> labels = readAllLinesOrExit(Paths.get(dir, "label.txt")); // 正解(ラベル)読み込み
+		byte[] graphDef = readAllBytesOrExit(Paths.get(dir, "wasan_model_09091142.pb"));
+		List<String> labels = readAllLinesOrExit(Paths.get(dir, "label.txt"));
 
 		for (int i = 0; i < imageFiles.length; i++) {
 			String[] result = new String[imageFiles[i].length];
@@ -102,7 +102,7 @@ public class CharacterRecognition {
 			for (int j = 0; j < imageFiles[i].length; j++) {
 				byte[] imageBytes = readAllBytesfromImage(imageFiles[i][j]); // 画像データ読み込み
 
-				try (Tensor<Float> image = constructAndExecuteGraphToNormalizeImage(imageBytes)) {// 一旦保留
+				try (Tensor<Float> image = constructAndExecuteGraphToNormalizeImage(imageBytes)) {
 					float[] labelProbabilities = executeInceptionGraph(graphDef, image);
 					int bestLabelIdx = maxIndex(labelProbabilities);
 
@@ -124,12 +124,71 @@ public class CharacterRecognition {
 		}
 	}
 
+	// ☆
 	/**
+	 * 文字要素の学習データであるpbファイルの内容をバイトデータとして読み込みます。<br>
+	 * 
+	 * @param path
+	 *            pbファイルのパスを表すPath型変数
+	 * @return 読み込んだpbファイルの内容を表すbyte型配列
+	 * 
+	 */
+	private static byte[] readAllBytesOrExit(Path path) {// pbファイルや画像ファイルを読み込めるかどうか
+		try {// 成功すれば、ファイルをバイトとして読み込み開始
+			return Files.readAllBytes(path);
+		} catch (IOException e) {// 失敗すれば、メッセージを表示して終了
+			showException(e);
+		}
+		return null;
+	}
+
+	// ☆
+	/**
+	 * 文字要素の正解ラベルが記録されたtxtファイルの全行を読み込みます。<br>
+	 * 
+	 * @param path
+	 *            txtファイルのパスを表すPath型変数
+	 * @return 読み込んだtxtファイルの全行を保持するString型リスト
+	 */
+	private static List<String> readAllLinesOrExit(Path path) {// 正解(ラベル)を読み込めるかどうか
+		try {// 成功すれば、ファイルから全ての行を読み取る
+			return Files.readAllLines(path, Charset.forName("UTF-8"));
+		} catch (IOException e) {// 失敗すれば、メッセージを表示して終了
+			showException(e);
+		}
+		return null;
+	}
+
+	// ☆
+	/**
+	 * 図形問題から切り出した文字要素の画像をバイトデータとして読み込みます。<br>
+	 * 
+	 * @param input
+	 *            文字要素の画像を表すBufferedImage型変数
+	 * @return 読み込んだ文字要素の画像を表すbyte型配列
+	 */
+	private static byte[] readAllBytesfromImage(BufferedImage input) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		BufferedOutputStream bos = new BufferedOutputStream(baos);
+
+		input.flush();
+		try {
+			ImageIO.write(input, "png", bos);
+		} catch (IOException e) {
+			showException(e);
+		}
+
+		return baos.toByteArray();
+	}
+
+	/**
+	 * <br>
 	 * 
 	 * @param imageBytes
+	 * 
 	 * @return
 	 */
-	private static Tensor<Float> constructAndExecuteGraphToNormalizeImage(byte[] imageBytes) {// 画像を正規化するためにグラフを作成、実行する
+	private static Tensor<Float> constructAndExecuteGraphToNormalizeImage(byte[] imageBytes) {
 		try (Graph g = new Graph()) {
 			GraphBuilder b = new GraphBuilder(g);
 
@@ -140,10 +199,10 @@ public class CharacterRecognition {
 			final Output<Float> scale = b.constant("scale", 255f, Float.class);
 
 			final Output<Float> cast = b.cast(b.decodeJpeg(input, 1), Float.class);
-			final Output<Float> expandDims = b.expandDims(cast, make_batch);// 次元調整
-			final Output<Float> resize = b.resizeBilinear(expandDims, size);// ここまでは画像サイズの調整?
-			final Output<Float> sub = b.sub(resize, mean);// なくてもあまり変わらなかった
-			final Output<Float> output = b.div(sub, scale);// Pythonでデータセット変換したときのあの式では?
+			final Output<Float> expandDims = b.expandDims(cast, make_batch);
+			final Output<Float> resize = b.resizeBilinear(expandDims, size);
+			final Output<Float> sub = b.sub(resize, mean);
+			final Output<Float> output = b.div(sub, scale);
 
 			try (Session s = new Session(g)) {
 				return s.runner().fetch(output.op().name()).run().get(0).expect(Float.class);
@@ -152,9 +211,12 @@ public class CharacterRecognition {
 	}
 
 	/**
+	 * <br>
 	 * 
 	 * @param graphDef
+	 * 
 	 * @param image
+	 * 
 	 * @return
 	 */
 	private static float[] executeInceptionGraph(byte[] graphDef, Tensor<Float> image) {// グラフと入力画像から正解を得る
@@ -179,8 +241,10 @@ public class CharacterRecognition {
 	}
 
 	/**
+	 * <br>
 	 * 
 	 * @param probabilities
+	 * 
 	 * @return
 	 */
 	private static int maxIndex(float[] probabilities) {// 推定として正しいindexを選択する
@@ -194,87 +258,42 @@ public class CharacterRecognition {
 	}
 
 	/**
-	 * 
-	 * @param input
-	 * @return
-	 */
-	private static byte[] readAllBytesfromImage(BufferedImage input) {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		BufferedOutputStream bos = new BufferedOutputStream(baos);
-
-		input.flush();
-		try {
-			ImageIO.write(input, "png", bos); // . png 型
-		} catch (IOException e) {
-			showException(e);
-		}
-
-		return baos.toByteArray();
-	}
-
-	/**
-	 * 
-	 * @param path
-	 * @return
-	 */
-	private static byte[] readAllBytesOrExit(Path path) {// pbファイルや画像ファイルを読み込めるかどうか
-		try {// 成功すれば、ファイルをバイトとして読み込み開始
-			return Files.readAllBytes(path);
-		} catch (IOException e) {// 失敗すれば、メッセージを表示して終了
-			showException(e);
-		}
-		return null;
-	}
-
-	/**
-	 * 
-	 * @param path
-	 * @return
-	 */
-	private static List<String> readAllLinesOrExit(Path path) {// 正解(ラベル)を読み込めるかどうか
-		try {// 成功すれば、ファイルから全ての行を読み取る
-			return Files.readAllLines(path, Charset.forName("UTF-8"));
-		} catch (IOException e) {// 失敗すれば、メッセージを表示して終了
-			showException(e);
-		}
-		return null;
-	}
-
-	/**
+	 * Tensorflowを利用した文字要素の認識をサポートするクラスです。<br>
 	 * 
 	 * @author Takuma Tsuchihashi
 	 */
 	private static class GraphBuilder {
+
+		// ☆
+		/**
+		 * Tensorflowにおける演算グラフを表します。<br>
+		 * ここでグラフとはテンソル(Tensor)オブジェクトをノードとする有向グラフを指し、このノードをオペレーションと呼びます。
+		 */
+		private Graph g;
+
+		// ☆
+		/**
+		 * Tensorflowの演算グラフ(Graph)を指定し、グラフの構築(GraphBuilder)に関するインスタンスを生成するコンストラクタです。<br>
+		 * 
+		 * @param g
+		 *            Tensorflowの演算グラフを表すGraph型変数
+		 */
 		GraphBuilder(Graph g) {
 			this.g = g;
 		}
 
-		Output<Float> div(Output<Float> x, Output<Float> y) { // 割り算?
-			return binaryOp("Div", x, y);
-		}
-
-		<T> Output<T> sub(Output<T> x, Output<T> y) {
-			return binaryOp("Sub", x, y);
-		}
-
-		<T> Output<Float> resizeBilinear(Output<T> images, Output<Integer> size) {
-			return binaryOp3("ResizeBilinear", images, size);
-		}
-
-		<T> Output<T> expandDims(Output<T> input, Output<Integer> dim) {
-			return binaryOp3("ExpandDims", input, dim);
-		}
-
-		<T, U> Output<U> cast(Output<T> value, Class<U> type) {
-			DataType dtype = DataType.fromClass(type);
-			return g.opBuilder("Cast", "Cast").addInput(value).setAttr("DstT", dtype).build().<U>output(0);
-		}
-
-		Output<UInt8> decodeJpeg(Output<String> contents, long channels) {
-			return g.opBuilder("DecodeJpeg", "DecodeJpeg").addInput(contents).setAttr("channels", channels).build()
-					.<UInt8>output(0);
-		}
-
+		// ☆
+		/**
+		 * 定数を入力とし、演算グラフに追加する新たなオペレーションを生成します。<br>
+		 * 
+		 * @param name
+		 *            生成された新たなオペレーションを参照する際の識別子を表すString型変数
+		 * @param value
+		 *            入力する定数を表す変数(変数の型に制限はない)
+		 * @param type
+		 *            生成するオペレーションに設定したいデータ型を表すClass型変数
+		 * @return 生成された新たなオペレーションを表すOutput型変数
+		 */
 		<T> Output<T> constant(String name, Object value, Class<T> type) {
 			try (Tensor<T> t = Tensor.<T>create(value, type)) {
 				return g.opBuilder("Const", name).setAttr("dtype", DataType.fromClass(type)).setAttr("value", t).build()
@@ -282,17 +301,129 @@ public class CharacterRecognition {
 			}
 		}
 
+		/**
+		 * <br>
+		 * 
+		 * @param contents
+		 * 
+		 * @param channels
+		 * 
+		 * @return
+		 */
+		Output<UInt8> decodeJpeg(Output<String> contents, long channels) {
+			return g.opBuilder("DecodeJpeg", "DecodeJpeg").addInput(contents).setAttr("channels", channels).build()
+					.<UInt8>output(0);
+		}
+
+		// ☆
+		/**
+		 * 既存のオペレーションに設定されたデータ型の変換を行います。<br>
+		 * 
+		 * @param value
+		 *            既存のオペレーションを表すOutput型変数
+		 * @param type
+		 *            既存のオペレーションに新たに設定したいデータ型を表すClass型変数
+		 * @return 新たなデータ型を設定したオペレーションを表すOutput型変数
+		 */
+		<T, U> Output<U> cast(Output<T> value, Class<U> type) {
+			DataType dtype = DataType.fromClass(type);
+			return g.opBuilder("Cast", "Cast").addInput(value).setAttr("DstT", dtype).build().<U>output(0);
+		}
+
+		/**
+		 * <br>
+		 * 
+		 * @param input
+		 * 
+		 * @param dim
+		 * 
+		 * @return
+		 */
+		<T> Output<T> expandDims(Output<T> input, Output<Integer> dim) {
+			return binaryOp3("ExpandDims", input, dim);
+		}
+
+		/**
+		 * <br>
+		 * 
+		 * @param images
+		 * 
+		 * @param size
+		 * 
+		 * @return
+		 */
+		<T> Output<Float> resizeBilinear(Output<T> images, Output<Integer> size) {
+			return binaryOp3("ResizeBilinear", images, size);
+		}
+
+		// ☆
+		/**
+		 * 演算グラフのノードに相当するオペレーション同士の乗算を実行します。<br>
+		 * 
+		 * @param x
+		 *            乗算における乗数を表すオペレーションに関するOutput型変数
+		 * @param y
+		 *            乗算における乗数を表すオペレーションに関するOutput型変数
+		 * @return 乗算の結果を表すオペレーションに関するOutput型変数
+		 */
+		<T> Output<T> sub(Output<T> x, Output<T> y) {
+			return binaryOp("Sub", x, y);
+		}
+
+		// ☆
+		/**
+		 * 演算グラフのノードに相当するオペレーション同士の除算を実行します。<br>
+		 * 
+		 * @param x
+		 *            除算における被除数を表すオペレーションに関するOutput型変数
+		 * @param y
+		 *            除算における除数を表すオペレーションに関するOutput型変数
+		 * @return 除算の結果を表すオペレーションに関するOutput型変数
+		 */
+		Output<Float> div(Output<Float> x, Output<Float> y) {
+			return binaryOp("Div", x, y);
+		}
+
+		// ☆
+		/**
+		 * 既存のオペレーションを入力とし、演算グラフに追加する新たなオペレーションを生成します。<br>
+		 * 
+		 * @param type
+		 *            生成された新たなオペレーションを参照する際の識別子を表すString型変数
+		 * @param in1
+		 *            入力する既存のオペレーションを表すOutput型変数
+		 * @param in2
+		 *            入力する既存のオペレーションを表すOutput型変数
+		 * @return 生成された新たなオペレーションを表すOutput型変数
+		 */
 		private <T> Output<T> binaryOp(String type, Output<T> in1, Output<T> in2) {
 			return g.opBuilder(type, type).addInput(in1).addInput(in2).build().<T>output(0);
 		}
 
+		// ☆
+		/**
+		 * 既存のオペレーションを入力とし、演算グラフに追加する新たなオペレーションを生成します。<br>
+		 * 
+		 * @param type
+		 *            生成された新たなオペレーションを参照する際の識別子を表すString型変数
+		 * @param in1
+		 *            入力する既存のオペレーションを表すOutput型変数
+		 * @param in2
+		 *            入力する既存のオペレーションを表すOutput型変数
+		 * @return 生成された新たなオペレーションを表すOutput型変数
+		 */
 		private <T, U, V> Output<T> binaryOp3(String type, Output<U> in1, Output<V> in2) {
 			return g.opBuilder(type, type).addInput(in1).addInput(in2).build().<T>output(0);
 		}
-
-		private Graph g;
 	}
 
+	// ☆
+	/**
+	 * 処理中に何らかの例外が発生した際、その詳細を表示します。<br>
+	 * 
+	 * @param e
+	 *            例外の内容を表すException型変数
+	 */
 	private static void showException(Exception e) {
 		StackTraceElement[] ste = e.getStackTrace();
 		System.err.println("例外発生 : " + e.getClass().getName());

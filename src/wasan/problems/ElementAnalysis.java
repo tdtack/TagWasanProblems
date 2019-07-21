@@ -3,7 +3,6 @@ package wasan.problems;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-//☆
 /**
  * 和算図形問題に含まれる幾何要素(点・線分・円)、図形要素(n角形・円)の認識に関するクラスです。<br>
  * 幾何要素はHough変換(HoughTransformクラス)を利用して抽出し、図形要素は抽出された幾何要素に基づいて分析されます。
@@ -12,14 +11,13 @@ import java.util.Arrays;
  */
 public class ElementAnalysis {
 
-	// ☆
 	/**
 	 * Hough変換を利用するためのHoughTransformクラス変数です。<br>
 	 * この変数を用いることでHoughTransformクラス内のメソッドなどを呼び出すことができます。
 	 */
 	private HoughTransform houghTrans;
 
-	// ☆以下、図形問題から仮抽出された幾何要素(点・線分・円)を保持するリストです。
+	// 以下、図形問題から仮抽出された幾何要素(点・線分・円)を保持するリストです。
 	/**
 	 * 図形問題から仮抽出された点を保持します。<br>
 	 * 仮抽出の点を補正した情報はdetectPointに記録されます。
@@ -36,7 +34,7 @@ public class ElementAnalysis {
 	 */
 	public ArrayList<MyCircle> scannedCircle = new ArrayList<MyCircle>();
 
-	// ☆以下、図形問題から仮抽出された要素を補正し、確定した幾何要素(点・線分)と図形要素(n角形・円)を保持するリストです。
+	// 以下、図形問題から仮抽出された要素を補正し、確定した幾何要素(点・線分)と図形要素(n角形・円)を保持するリストです。
 	/**
 	 * 図形問題から仮抽出された点を補正し、確定した点を保持します。<br>
 	 * 仮抽出の点を保持するscannedPointを補正した情報を記録します。
@@ -58,7 +56,6 @@ public class ElementAnalysis {
 	 */
 	public ArrayList<MyPolygon> detectedPolygon = new ArrayList<MyPolygon>();
 
-	// ☆
 	/**
 	 * Hough変換(HoughTransform)を指定し、要素分析(ElementAnalysis)のインスタンスを生成するコンストラクタです。<br>
 	 * 
@@ -69,7 +66,6 @@ public class ElementAnalysis {
 		this.houghTrans = _houghTrans;
 	}
 
-	// ☆
 	/**
 	 * 自動タグ付けが完了した図形問題に関する不要なオブジェクトをメモリから解放します。<br>
 	 * 複数の図形問題に対して連続的に自動タグ付けを行う際、OutOfMemoryErrorを回避します。
@@ -87,42 +83,44 @@ public class ElementAnalysis {
 		this.detectedPolygon.clear();
 	}
 
-	// ☆
 	/**
 	 * Hough変換を利用して仮抽出された線分と円に基づき、図形問題から点を仮抽出します。<br>
 	 * また、仮抽出の点の重複について修正を行います。
 	 */
-	public void scanPoint() {// 検出した線分と円から交点を総当たりで検出
-		for (int i = 0; i < this.scannedLine.size(); i++) {// 線分同士の交点の検出
+	public void scanPoint() {
+		//
+		for (int i = 0; i < this.scannedLine.size(); i++) {
 			for (int j = i + 1; j < this.scannedLine.size(); j++) {
 				MyLine l1 = this.scannedLine.get(i);
 				MyLine l2 = this.scannedLine.get(j);
 
-				MyPoint p = MyPoint.getIntersection1(l1, l2, 1);
+				MyPoint p = MyPoint.getIntersection1(l1, l2, 1);// 2本の線分同士の交点を取得します。
 				if (p != null) {
 					this.scannedPoint.add(p);
 				}
 			}
 		}
 
-		for (int i = 0; i < this.scannedLine.size(); i++) {// 線分と円の交点の検出
+		//
+		for (int i = 0; i < this.scannedLine.size(); i++) {
 			for (int j = 0; j < this.scannedCircle.size(); j++) {
 				MyLine l = this.scannedLine.get(i);
 				MyCircle c = this.scannedCircle.get(j);
 
-				MyPoint p1 = MyPoint.getIntersection2(l, c, 1);
+				MyPoint p1 = MyPoint.getIntersection2(l, c, 1);// 線分と円の交点を取得します。
 				if (p1 != null) {
 					this.scannedPoint.add(p1);
 				}
 
-				MyPoint p2 = MyPoint.getIntersection2(l, c, 2);
+				MyPoint p2 = MyPoint.getIntersection2(l, c, 2);// 線分と円の交点を取得します。
 				if (p2 != null) {
 					this.scannedPoint.add(p2);
 				}
 			}
 		}
 
-		for (int i = 0; i < this.scannedLine.size(); i++) {// 線分の端点の検出
+		// 以下、線分の端点の検出
+		for (int i = 0; i < this.scannedLine.size(); i++) {
 			MyPoint p1 = this.scannedLine.get(i).start;
 			if (p1 != null) {
 				this.scannedPoint.add(p1);
@@ -134,13 +132,12 @@ public class ElementAnalysis {
 			}
 		}
 
-		// 被りがある点の排除
+		//
 		for (int i = 0; i < this.scannedPoint.size(); i++) {
-			this.scannedPoint = organizePoint(i, i + 1);// 重複をなくす
+			this.scannedPoint = organizePoint(i, i + 1);// 仮抽出された線分と円に基づき、図形問題から仮抽出された点の重複を修正します。
 		}
 	}
 
-	// ☆
 	/**
 	 * 仮抽出された線分と円に基づき、図形問題から仮抽出された点の重複を修正します。<br>
 	 * 重複はユークリッド距離が近い2点について可能な範囲で修正されます。
@@ -156,7 +153,7 @@ public class ElementAnalysis {
 			MyPoint p1 = this.scannedPoint.get(i);
 			MyPoint p2 = this.scannedPoint.get(index1);
 
-			if (p1.calcDistToPoint(p2) < 20) {
+			if (p1.calcDistToPoint(p2) < 20) {// 2点間の距離を取得します。
 				for (int j = 0; j < this.scannedLine.size(); j++) {
 					MyLine l = this.scannedLine.get(j);
 					if (l.start == p1) {
@@ -177,7 +174,6 @@ public class ElementAnalysis {
 		return this.scannedPoint;
 	}
 
-	// ☆
 	/**
 	 * Hough変換を利用して図形問題から線分を仮抽出します。<br>
 	 * また、仮抽出の線分の端点について修正を行います。
@@ -199,7 +195,6 @@ public class ElementAnalysis {
 		this.scannedLine = organizeLine();// Hough変換を利用して図形問題から仮抽出された線分の端点を修正します。
 	}
 
-	// ☆
 	/**
 	 * Hough変換を利用して図形問題から仮抽出された線分の端点を修正します。<br>
 	 * 端点は次数が2未満であるものについて可能な範囲で修正されます。
@@ -214,7 +209,7 @@ public class ElementAnalysis {
 			for (int j = i + 1; j < this.scannedLine.size(); j++) {
 				MyLine l2 = this.scannedLine.get(j);
 
-				MyPoint p = MyPoint.getIntersection1(l1, l2, 2);
+				MyPoint p = MyPoint.getIntersection1(l1, l2, 2);// 2本の直線同士の交点を取得します。
 				if (l1.start.isOnLine(l2)) {
 					l1.start.x = p.x;
 					l1.start.y = p.y;
@@ -228,8 +223,8 @@ public class ElementAnalysis {
 			for (int j = 0; j < this.scannedCircle.size(); j++) {
 				MyCircle c = this.scannedCircle.get(j);
 
-				MyPoint p1 = MyPoint.getIntersection2(l1, c, 1);
-				MyPoint p2 = MyPoint.getIntersection2(l1, c, 2);
+				MyPoint p1 = MyPoint.getIntersection2(l1, c, 1);// 線分と円の交点を取得します。
+				MyPoint p2 = MyPoint.getIntersection2(l1, c, 2);// 線分と円の交点を取得します。
 				MyPoint p3 = null;
 
 				if (p1 != null && p2 == null) {
@@ -257,7 +252,6 @@ public class ElementAnalysis {
 		return this.scannedLine;
 	}
 
-	// ☆
 	/**
 	 * Hough変換を利用して図形問題から円を仮抽出します。<br>
 	 * 
@@ -278,7 +272,8 @@ public class ElementAnalysis {
 	}
 
 	/**
-	 * あああ
+	 * 図形問題から仮抽出された点や線分を補正し、互いに関連付けます。<br>
+	 * この点と線分の関連付けは、図形要素のn角形の認識を目的に行われます。
 	 */
 	public void relateElement() {
 		relateToPoint1();// ①点から見た関係性(次数)の定義
@@ -293,7 +288,8 @@ public class ElementAnalysis {
 	}
 
 	/**
-	 * 
+	 * 任意の1点を通過する線分や円について、関連付けを行います。<br>
+	 * これらは任意の1点に対して、線分や円との関連性が記録されます。
 	 */
 	private void relateToPoint1() {// ①点から見た関係性(次数)の定義
 		for (int i = 0; i < this.scannedPoint.size(); i++) {
@@ -318,7 +314,8 @@ public class ElementAnalysis {
 	}
 
 	/**
-	 * 
+	 * 点との関連性に基づき、線分の補正・削除を行います。<br>
+	 * 補正・削除は特に次数が1である端点を持つ線分を対象とします。
 	 */
 	private void modifyLine() {// ②次数が1の線分の調整(両端が1ならば線分ごと削除、片方が1ならば....)
 		modifyLine1();// 両端の次数が1の場合
@@ -326,7 +323,7 @@ public class ElementAnalysis {
 	}
 
 	/**
-	 * 
+	 * 両方の端点の次数が1である線分を補正・削除します。<br>
 	 */
 	private void modifyLine1() {
 		for (int i = this.scannedLine.size() - 1; i >= 0; i--) {
@@ -374,7 +371,7 @@ public class ElementAnalysis {
 	}
 
 	/**
-	 * 
+	 * 片方の端点の次数が1である線分を補正します。<br>
 	 */
 	private void modifyLine2() {
 		for (int i = this.scannedLine.size() - 1; i >= 0; i--) {
@@ -396,16 +393,14 @@ public class ElementAnalysis {
 				pointArray[0] = (type == 1) ? l1.start : l1.end;
 				pointArray[1] = (type == 1) ? l1.end : l1.start;
 
-				for (int j = 0; j < this.scannedLine.size(); j++) {// 引き寄せる感じ
+				for (int j = 0; j < this.scannedLine.size(); j++) {
 					MyLine l2 = this.scannedLine.get(j);
 					if ((l1 != l2) && pointArray[0].calcDistToLine(l2) < 10) {
 						double dist1 = pointArray[0].calcDistToPoint(l2.start);
 						double dist2 = pointArray[0].calcDistToPoint(l2.end);
 						if (dist1 < dist2) {
-							// this.scannedPoint.remove(l2.start);
 							l2.start = pointArray[0];
 						} else {
-							// this.scannedPoint.remove(l2.end);
 							l2.end = pointArray[0];
 						}
 						complete = true;
@@ -416,7 +411,7 @@ public class ElementAnalysis {
 					double minDist = Double.MAX_VALUE;
 					MyPoint p1 = null;
 
-					for (int j = 0; j < this.scannedPoint.size(); j++) {// 引き寄せられる感じ
+					for (int j = 0; j < this.scannedPoint.size(); j++) {
 						MyPoint p2 = this.scannedPoint.get(j);
 						if (p2.calcDistToLine(l1) < 10) {
 							if (p2 != pointArray[0] && p2.calcDistToPoint(pointArray[0]) < minDist) {
@@ -440,7 +435,8 @@ public class ElementAnalysis {
 	}
 
 	/**
-	 * 
+	 * 線分や円との関連性に基づき、点の削除を行います。<br>
+	 * 特に線分や円から発生した交点を対象とします。
 	 */
 	private void modifyPoint() {
 		for (int i = this.scannedPoint.size() - 1; i >= 0; i--) {
@@ -454,9 +450,11 @@ public class ElementAnalysis {
 	}
 
 	/**
+	 * 任意の1点が線分の端点であるか否かを判定します。<br>
 	 * 
 	 * @param p
-	 * @return
+	 *            任意の1点を表すMyPointクラス変数
+	 * @return 任意の1点が線分の端点であるか否かを示すboolean型変数
 	 */
 	private boolean isEndPoint(MyPoint p) {// 点が線分の端点かどうかの判定
 		for (int i = 0; i < this.scannedLine.size(); i++) {
@@ -469,7 +467,8 @@ public class ElementAnalysis {
 	}
 
 	/**
-	 * 
+	 * 任意の線分上に存在する点について、関連付けを行います。<br>
+	 * これらは任意の線分に対して、点との関連性が記録されます。
 	 */
 	private void relateToLine() {
 		for (int i = 0; i < this.scannedLine.size(); i++) {// 点との関連性定義(線分上の点)
@@ -484,7 +483,8 @@ public class ElementAnalysis {
 	}
 
 	/**
-	 * 
+	 * 任意の1点と線分を介して繋がる点について、関連付けを行います。<br>
+	 * これらは任意の1点に対して、その他の点との関連性が記録されます。
 	 */
 	private void relateToPoint2() {
 		for (int i = 0; i < this.scannedPoint.size(); i++) {
@@ -502,9 +502,9 @@ public class ElementAnalysis {
 	}
 
 	/**
-	 * 
+	 * 補正した要素を抽出された幾何要素(点・線分・円)として確定し、図形要素(n角形・円)を分析します。<br>
 	 */
-	public void detectElement() {// circle→line→pointの順でもいいんでは?
+	public void detectElement() {
 		detectCircle();
 		detectLine();
 		detectPoint();
@@ -512,7 +512,7 @@ public class ElementAnalysis {
 	}
 
 	/**
-	 * 
+	 * 補正した円を図形問題から抽出された円として確定し、記録します。<br>
 	 */
 	private void detectCircle() {
 		for (int i = 0; i < this.scannedCircle.size(); i++) {
@@ -521,7 +521,7 @@ public class ElementAnalysis {
 	}
 
 	/**
-	 * 
+	 * 補正した線分を図形問題から抽出された線分として確定し、記録します。<br>
 	 */
 	private void detectLine() {
 		for (int i = 0; i < this.scannedLine.size(); i++) {
@@ -530,7 +530,7 @@ public class ElementAnalysis {
 	}
 
 	/**
-	 * 
+	 * 補正した点を図形問題から抽出された点として確定し、記録します。<br>
 	 */
 	private void detectPoint() {
 		for (int i = 0; i < this.scannedPoint.size(); i++) {
@@ -539,11 +539,11 @@ public class ElementAnalysis {
 	}
 
 	/**
-	 * 
+	 * 抽出が確定した点と線分に基づき、図形問題に含まれるn角形を分析します。<br>
 	 */
 	private void detectPolygon() {
 		for (int i = 3; i <= 6; i++) {
-			PolygonAnalysis.generateCombination(this.detectedPoint, new int[i], 0, 1);// 3角形の点候補,4角形の点候補...
+			PolygonAnalysis.generateCombination(this.detectedPoint, new int[i], 0, 1);// n角形毎に考えられる頂点の組み合わせを列挙します。
 
 			for (int j = 0; j < PolygonAnalysis.combination.length; j++) {
 				// ①点候補セット(n個で1セット)を1つ作成する。(後の計算量を減らすために少し工夫する)
@@ -555,8 +555,8 @@ public class ElementAnalysis {
 
 				// ②作成した1つの点候補セットに対して、(n-1)!通りの順列を列挙する。
 				// int c = (myPoly2.cirPermutation(r)).intValue();// = (n-1)!
-				int[][] permutation = new int[(PolygonAnalysis.calcFactorial(i - 1))][i];// candidate1を加えただけの長さにしたい
-				PolygonAnalysis.generatePermutation(combination2, new int[0]);
+				int[][] permutation = new int[(PolygonAnalysis.calcFactorial(i - 1))][i];
+				PolygonAnalysis.generatePermutation(combination2, new int[0]);// n角形の頂点の組み合わせ毎の順列を列挙します。
 				for (int k = 0; k < permutation.length; k++) {
 					permutation[k][0] = combination1[0];
 					for (int l = 1; l < permutation[k].length; l++) {
@@ -566,7 +566,7 @@ public class ElementAnalysis {
 
 				// ③列挙した順列を回転するように検査する
 				for (int k = 0; k < permutation.length; k++) {
-					if (PolygonAnalysis.isPolygon(this.detectedPoint, permutation[k])) {
+					if (PolygonAnalysis.isPolygon(this.detectedPoint, permutation[k])) {// 図形問題から抽出された点のうち、任意のn点がn角形を構成するか否かを判定します。
 						MyPoint[] vertex = new MyPoint[permutation[k].length];
 						for (int l = 0; l < permutation[k].length; l++) {
 							vertex[l] = this.detectedPoint.get(permutation[k][l]);
@@ -584,29 +584,45 @@ public class ElementAnalysis {
 	}
 
 	/**
-	 * 
+	 * 和算図形問題に含まれるn角形の認識に関するクラスです。<br>
+	 * このクラスでは、主にn角形の分析に利用するアルゴリズムを定義します。
 	 * 
 	 * @author Takuma Tsuchihashi
 	 */
 	private static class PolygonAnalysis {
 
-		/** n角形候補となる点の組み合わせ */
-		static int[][] combination;// ☆
+		/**
+		 * n角形毎に考えられる頂点の組み合わせを保持します。<br>
+		 * 組み合わせは頂点が持つインデックスによって管理されます。
+		 */
+		static int[][] combination;
 
-		/** n角形候補となる点の順列 */
-		static int[][] permutation;// ☆
+		/**
+		 * n角形の頂点の組み合わせ毎の順列を保持します。<br>
+		 * 順列は頂点が持つインデックスによって管理されます。
+		 */
+		static int[][] permutation;
 
+		/**
+		 * n角形の頂点の組み合わせや順列を列挙する際に利用するインデックスです。<br>
+		 */
 		static int index;
 
 		/**
-		 * 組み合わせを列挙する関数
+		 * n角形毎に考えられる頂点の組み合わせを列挙します。<br>
+		 * これらの組み合わせは頂点が持つインデックスに基づいて列挙されます。
 		 * 
-		 * @param n
+		 * @param pointList
+		 *            図形問題から抽出された点を保持するMyPointクラスリスト
 		 * @param r
+		 *            図形問題から抽出された点のうち、任意で取り出す個数を表すint型配列(N個を取り出す際は必ずnew
+		 *            int[N]を代入してください。)
 		 * @param start
+		 *            n角形の頂点の組み合わせを列挙する際に利用するint型変数(メソッドを呼び出す際は必ず0を代入してください。)
 		 * @param plus
+		 *            n角形の頂点の組み合わせを列挙する際に利用するint型変数(メソッドを呼び出す際は必ず1を代入してください。)
 		 */
-		static void generateCombination(ArrayList<MyPoint> pointList, int[] r, int start, int plus) {// r個を取り出す
+		static void generateCombination(ArrayList<MyPoint> pointList, int[] r, int start, int plus) {
 			if (plus <= 1) {
 				combination = new int[calcCombination(pointList.size(), r.length)][r.length];
 				for (int i = 0; i < combination.length; i++) {
@@ -631,7 +647,17 @@ public class ElementAnalysis {
 			}
 		}
 
-		static void generatePermutation(int[] n, int[] array) {// nの階乗だけ生成される
+		/**
+		 * n角形の頂点の組み合わせ毎の順列を列挙します。<br>
+		 * これらの順列は頂点が持つインデックスに基づいて列挙されます。
+		 * 
+		 * @param n
+		 *            n角形の頂点の組み合わせ(頂点のインデックスの組み合わせ)を保持するint型配列
+		 * @param array
+		 *            n角形の頂点の組み合わせ毎の順列を列挙する際に利用するint型配列(メソッドを呼び出す際は必ずnew
+		 *            int[0]を代入してください。)
+		 */
+		static void generatePermutation(int[] n, int[] array) {
 			if (array.length == 0) {
 				permutation = new int[(calcFactorial(n.length))][n.length];
 				for (int i = 0; i < permutation.length; i++) {
@@ -649,13 +675,22 @@ public class ElementAnalysis {
 				index++;
 			} else {
 				for (int i = 0; i < n.length; i++) {
-					int[] value = { n[i] };// value
+					int[] value = { n[i] };
 					generatePermutation(concatArray(extractArray(n, 0, i), extractArray(n, i + 1)),
 							concatArray(array, value));
 				}
 			}
 		}
 
+		/**
+		 * 2つのint型配列を結合し、新たな配列として取得します。<br>
+		 * 
+		 * @param array1
+		 *            結合したい1つ目のint型配列
+		 * @param array2
+		 *            結合したい2つ目のint型配列
+		 * @return 2つのint型配列を結合した、新たなint型配列
+		 */
 		static int[] concatArray(int[] array1, int[] array2) {
 			int[] newArray = new int[array1.length + array2.length];
 			for (int i = 0; i < array1.length; i++) {
@@ -667,6 +702,15 @@ public class ElementAnalysis {
 			return newArray;
 		}
 
+		/**
+		 * int型配列から任意の範囲の要素を取り出し、新たな配列として取得します。<br>
+		 * 
+		 * @param array
+		 *            任意の範囲の要素を取り出したいint型配列
+		 * @param index
+		 *            要素を取り出す範囲を表すint型変数(引数が1つの場合はインデックス～最後、引数が2つの場合はインデックス1～インデックス2の範囲を取り出します。)
+		 * @return 任意の範囲の要素を取り出した、新たなint型配列
+		 */
 		static int[] extractArray(int[] array, int... index) {
 			int start = index[0];
 			int end = (index.length > 1) ? index[1] : array.length;
@@ -680,10 +724,11 @@ public class ElementAnalysis {
 		}
 
 		/**
-		 * nの階乗を計算する
+		 * nの階乗の値を計算します。<br>
 		 * 
-		 * @param n
-		 * @return
+		 * @param num
+		 *            nの階乗の"n"を表すint型変数
+		 * @return nの階乗の値を表すint型変数
 		 */
 		static int calcFactorial(int num) {
 			if (num <= 1) {
@@ -693,11 +738,13 @@ public class ElementAnalysis {
 		}
 
 		/**
-		 * n個の中からr個を取り出す組み合わせを計算する
+		 * n個の中からr個を取り出す組み合わせ総数の値を計算します。<br>
 		 * 
 		 * @param n
+		 *            「n個の中からr個を取り出す」の"n"を表すint型変数
 		 * @param r
-		 * @return
+		 *            「n個の中からr個を取り出す」の"r"を表すint型変数
+		 * @return n個の中からr個を取り出す組み合わせ総数の値を表すint型変数
 		 */
 		static int calcCombination(int n, int r) {
 			if (n < r) {
@@ -715,17 +762,35 @@ public class ElementAnalysis {
 			return calcCombination(n - 1, r - 1) + calcCombination(n - 1, r);
 		}
 
+		/**
+		 * 図形問題から抽出された点のうち、任意のn点がn角形を構成するか否かを判定します。<br>
+		 * 
+		 * @param pointList
+		 *            図形問題から抽出された点を保持するMyPointクラスリスト
+		 * @param pattern
+		 *            任意のn点の順列(点のインデックスの順列)を保持するint型配列
+		 * @return 任意のn点がn角形を構成するか否かを示すboolean型変数
+		 */
 		static boolean isPolygon(ArrayList<MyPoint> pointList, int[] pattern) {
 			boolean[] condition = new boolean[4];
 
-			condition[0] = isCycle(pointList, pattern);// 円周りでつながっているか
-			condition[1] = isConvex(pointList, pattern);// 凸性を満たすか
-			condition[2] = notSelfCross(pointList, pattern);// 自己交差はないか
-			condition[3] = notCollinear(pointList, pattern);// 1直線をなす3点はないか
+			condition[0] = isCycle(pointList, pattern);
+			condition[1] = isConvex(pointList, pattern);
+			condition[2] = notSelfCross(pointList, pattern);
+			condition[3] = notCollinear(pointList, pattern);
 
 			return (condition[0] && condition[1] && condition[2] && condition[3]);
 		}
 
+		/**
+		 * 図形問題から抽出された点のうち、任意のn点が閉路を構成するか否かを判定します。<br>
+		 * 
+		 * @param pointList
+		 *            図形問題から抽出された点を保持するMyPointクラスリスト
+		 * @param pattern
+		 *            任意のn点の順列(点のインデックスの順列)を保持するint型配列
+		 * @return 任意のn点が閉路を構成するか否かを示すboolean型変数
+		 */
 		static boolean isCycle(ArrayList<MyPoint> pointList, int[] pattern) {
 			int pairNum = 2;// pattern 0 2 3 5 → [0, 2][2, 3][3, 5][5, 0]
 			int[][] pair = generatePair(pattern, pairNum);
@@ -749,6 +814,15 @@ public class ElementAnalysis {
 			return false;
 		}
 
+		/**
+		 * 図形問題から抽出された点のうち、任意のn点による閉路が凸性を満たすか否かを判定します。<br>
+		 * 
+		 * @param pointList
+		 *            図形問題から抽出された点を保持するMyPointクラスリスト
+		 * @param pattern
+		 *            任意のn点の順列(点のインデックスの順列)を保持するint型配列
+		 * @return 任意のn点による閉路が凸性を満たすか否かを示すboolean型変数
+		 */
 		static boolean isConvex(ArrayList<MyPoint> pointList, int[] pattern) {
 			int pairNum = 3;// pattern 0 2 3 5 → [0, 2, 3][2, 3, 5][3, 5, 0][5,
 							// 0, 2]
@@ -781,6 +855,15 @@ public class ElementAnalysis {
 			return (count == pattern.length);
 		}
 
+		/**
+		 * 図形問題から抽出された点のうち、任意のn点による閉路が自己交差を持たないか否かを判定します。<br>
+		 * 
+		 * @param pointList
+		 *            図形問題から抽出された点を保持するMyPointクラスリスト
+		 * @param pattern
+		 *            任意のn点の順列(点のインデックスの順列)を保持するint型配列
+		 * @return 任意のn点による閉路が自己交差を持たないか否かを示すboolean型変数
+		 */
 		static boolean notSelfCross(ArrayList<MyPoint> pointList, int[] pattern) {// 自己交差がないか
 			MyPoint centroid = new MyPoint(0, 0);
 			for (int i = 0; i < pattern.length; i++) {
@@ -796,6 +879,15 @@ public class ElementAnalysis {
 			return (crossNum % 2 == 1 && windNum != 0);
 		}
 
+		/**
+		 * 図形問題から抽出された点のうち、任意のn点による閉路が共線条件を満たさないか否かを判定します。<br>
+		 * 
+		 * @param pointList
+		 *            図形問題から抽出された点を保持するMyPointクラスリスト
+		 * @param pattern
+		 *            任意のn点の順列(点のインデックスの順列)を保持するint型配列
+		 * @return 任意のn点による閉路が共線条件を満たさないか否かを示すboolean型変数
+		 */
 		static boolean notCollinear(ArrayList<MyPoint> pointList, int[] pattern) {
 			int pairNum = 3;
 			int[][] pair = generatePair(pattern, pairNum);
@@ -826,6 +918,16 @@ public class ElementAnalysis {
 			return (count == pattern.length);
 		}
 
+		/**
+		 * 任意のn点の順列(点のインデックスの順列)を定数で分割したペアを作成します。<br>
+		 * 例えば、点のインデックスの順列をi1,i2,i3として2で分割した場合、[i1,i2],[i2,i3],[i3,i1]のペアが生成されます。
+		 * 
+		 * @param pattern
+		 *            任意のn点の順列(点のインデックスの順列)を保持するint型配列
+		 * @param pairNum
+		 *            分割する数を表すint型変数
+		 * @return 任意のn点の順列(点のインデックスの順列)を定数で分割したペアを保持するint型配列
+		 */
 		static int[][] generatePair(int[] pattern, int pairNum) {
 			int[][] pair = new int[pattern.length][pairNum];
 
@@ -841,6 +943,18 @@ public class ElementAnalysis {
 			return pair;
 		}
 
+		/**
+		 * 交差数に基づいて、任意のn点による閉路に対してある点が内部に含まれるか否かを判定します。<br>
+		 * 交差数とは、ある点から引いた半直線が任意のn点による閉路と交差する回数を表します。
+		 * 
+		 * @param pointList
+		 *            図形問題から抽出された点を保持するMyPointクラスリスト
+		 * @param pattern
+		 *            任意のn点の順列(点のインデックスの順列)を保持するint型配列
+		 * @param p
+		 *            対象となる点を表すMyPointクラス変数
+		 * @return 交差数に基づいて、任意のn点による閉路に対してある点が内部に含まれるか否かを示すboolean型変数
+		 */
 		static int countCrossNum(ArrayList<MyPoint> pointList, int[] pattern, MyPoint p) {
 			int crossNum = 0;
 
@@ -861,6 +975,18 @@ public class ElementAnalysis {
 			return crossNum;
 		}
 
+		/**
+		 * 回転数に基づいて、任意のn点による閉路に対してある点が内部に含まれるか否かを判定します。<br>
+		 * 回転数とは、任意のn点による閉路がある点の周りを周る回数を表します。
+		 * 
+		 * @param pointList
+		 *            図形問題から抽出された点を保持するMyPointクラスリスト
+		 * @param pattern
+		 *            任意のn点の順列(点のインデックスの順列)を保持するint型配列
+		 * @param p
+		 *            対象となる点を表すMyPointクラス変数
+		 * @return 回転数に基づいて、任意のn点による閉路に対してある点が内部に含まれるか否かを示すboolean型変数
+		 */
 		static int countWindNum(ArrayList<MyPoint> pointList, int[] pattern, MyPoint p) {
 			int windNum = 0;
 

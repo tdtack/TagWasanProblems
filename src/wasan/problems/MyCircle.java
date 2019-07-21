@@ -10,7 +10,7 @@ import java.util.ArrayList;
  */
 public class MyCircle {
 
-	// ☆以下、円を構成する要素を表す変数・配列です。
+	// 以下、円を構成する要素を表す変数・配列です。
 	/**
 	 * 円の中心を表します。<br>
 	 */
@@ -24,7 +24,7 @@ public class MyCircle {
 	 */
 	public MyPoint[] circum = new MyPoint[8];
 
-	// ☆以下、円をx^2+bx+y^2+cy+d=0の方程式で表現した際のパラメータを表すdouble型変数です。
+	// 以下、円をx^2+bx+y^2+cy+d=0の方程式で表現した際のパラメータを表すdouble型変数です。
 	/**
 	 * 円を示す方程式x^2+bx+y^2+cy+d=0の係数bを表します。<br>
 	 */
@@ -38,7 +38,7 @@ public class MyCircle {
 	 */
 	public double d;
 
-	// ☆以下、円を示す方程式x^2+bx+y^2+cy+d=0のパラメータを正規化した値を表すdouble型変数です。
+	// 以下、円を示す方程式x^2+bx+y^2+cy+d=0のパラメータを正規化した値を表すdouble型変数です。
 	/**
 	 * 円を示す方程式x^2+bx+y^2+cy+d=0の係数bを正規化した値です。<br>
 	 */
@@ -51,8 +51,7 @@ public class MyCircle {
 	 * 円を示す方程式x^2+bx+y^2+cy+d=0の定数dを正規化した値です。<br>
 	 */
 	public double nd;
-
-	// ☆
+	
 	/**
 	 * 円の中心と半径を指定し、円のインスタンスを生成するコンストラクタです。<br>
 	 * 
@@ -82,8 +81,7 @@ public class MyCircle {
 		this.nc = this.c / scalar;
 		this.nd = this.d / scalar;
 	}
-
-	// ☆
+	
 	/**
 	 * 「円がn角形に内接する」を満たすか否かを判定します。 <br>
 	 * 「円がn角形に内接する」は円から見たn角形との関係性の1つです。
@@ -104,8 +102,7 @@ public class MyCircle {
 
 		return (condition[0] && condition[1] && condition[2]);
 	}
-
-	// ☆
+	
 	/**
 	 * 「円がn角形の内部に存在する」を満たすか否かを判定します。 <br>
 	 * 「円がn角形の内部に存在する」は円から見たn角形との関係性の1つです。
@@ -127,8 +124,7 @@ public class MyCircle {
 
 		return (condition[0] && condition[1] && condition[2]);
 	}
-
-	// ☆
+	
 	/**
 	 * 「円とn角形が互いに重なり合う」を満たすか否かを判定します。 <br>
 	 * 「円とn角形が互いに重なり合う」は円から見たn角形との関係性の1つです。
@@ -153,8 +149,7 @@ public class MyCircle {
 
 		return (condition[0][0] && condition[1][0] && (condition[2][0] || condition[2][1]));
 	}
-
-	// ☆
+	
 	/**
 	 * 「円Aが円Bの内側で接する」を満たすか否かを判定します。 <br>
 	 * 「円Aが円Bの内側で接する」は二つの円同士の関係性の1つです。
@@ -174,8 +169,7 @@ public class MyCircle {
 
 		return (condition[0] && condition[1]);
 	}
-
-	// ☆
+	
 	/**
 	 * 「円Aが円Bの内部に存在する」を満たすか否かを判定します。 <br>
 	 * 「円Aが円Bの内部に存在する」は二つの円同士の関係性の1つです。
@@ -195,8 +189,7 @@ public class MyCircle {
 
 		return (condition[0] && condition[1]);
 	}
-
-	// ☆
+	
 	/**
 	 * 「円Aと円Bが互いに外接する」を満たすか否かを判定します。 <br>
 	 * 「円Aと円Bが互いに外接する」は二つの円同士の関係性の1つです。
@@ -216,8 +209,7 @@ public class MyCircle {
 
 		return (condition[0] && condition[1]);
 	}
-
-	// ☆
+	
 	/**
 	 * 「円Aと円Bが互いに重なり合う」を満たすか否かを判定します。 <br>
 	 * 「円Aと円Bが互いに重なり合う」は二つの円同士の関係性の1つです。
@@ -238,12 +230,14 @@ public class MyCircle {
 
 		return (condition[0] && condition[1]);
 	}
-
+	
 	/**
-	 * 円から見たn角形全ての頂点の内外
+	 * 円に対するn角形の全ての頂点の状態を記録します。<br>
+	 * 記録される状態は「頂点が円の内部にある」「頂点が円上にある」「頂点が円の外部にある」です。
 	 * 
-	 * @param pg
-	 * @return
+	 * @param vertex
+	 *            n角形の頂点を保持するMyPointクラスリスト
+	 * @return 頂点の状態を保持するint型配列
 	 */
 	public int[] classifyVertex(ArrayList<MyPoint> vertex) {
 		int[] vertexState = new int[3];// 0:円の内側, 1:円上, 2:円の外側
@@ -264,12 +258,14 @@ public class MyCircle {
 		}
 		return vertexState;
 	}
-
+	
 	/**
-	 * 円から見たn角形全ての辺の内外
+	 * 円に対するn角形の全ての辺の状態を記録します。<br>
+	 * 記録される状態は「辺と円の中心との距離が半径より小さい」「辺が円に接する」「辺と円の中心との距離が半径より大きい」です。
 	 * 
-	 * @param pg
-	 * @return
+	 * @param side
+	 *            n角形の辺を保持するMyPointクラスリスト
+	 * @return 辺の状態を保持するint型配列
 	 */
 	public int[] classifySide(ArrayList<MyLine> side) {
 		int[] sideState = new int[3];// 0:円の内側, 1:円に接する, 2:円の外側
@@ -291,34 +287,37 @@ public class MyCircle {
 
 		return sideState;
 	}
-
+	
 	/**
-	 * 円から見た点の内外
+	 * 円に対して点が内部に含まれるか否かを判定します。<br>
 	 * 
 	 * @param p
-	 * @return
+	 *            対象となる点を表すMyPointクラス変数
+	 * @return 円に対して点が内部に含まれるか否かを示すboolean型変数
 	 */
 	public boolean includePoint(MyPoint p) {
 		double dist = this.center.calcDistToPoint(p);
 
 		return isGreater(this.radius, dist);
 	}
-
+	
 	/**
-	 * 円周と点との距離
+	 * 円周と点との距離を取得します。<br>
 	 * 
 	 * @param p
-	 * @return
+	 *            対象となる点を表すMyPointクラス変数
+	 * @return 円周と点との距離を表すdouble型変数
 	 */
 	double calcDistToPoint(MyPoint p) {
 		return Math.abs(Math.hypot((p.x - center.x), (p.y - center.y)) - radius);
 	}
-
+	
 	/**
-	 * 円の中心と直線の距離
+	 * 円の中心と線分の距離を取得します。<br>
 	 * 
 	 * @param l
-	 * @return
+	 *            対象となる点を表すMyLineクラス変数
+	 * @return 円の中心と線分の距離を表すdouble型変数
 	 */
 	double calcDistToLine(MyLine l) {
 		MyPoint p = this.center.getPerpendicularFoot(l);
@@ -337,19 +336,22 @@ public class MyCircle {
 		}
 		return Double.MAX_VALUE;
 	}
-
+	
 	/**
+	 * 任意の値が指定した範囲内の値であるか否かを判定します。<br>
 	 * 
 	 * @param value
+	 *            対象となる値を表すint型変数
 	 * @param min
+	 *            指定する範囲の最小値を表すint型変数
 	 * @param max
-	 * @return
+	 *            指定する範囲の最大値を表すint型変数
+	 * @return 任意の値が指定した範囲内の値であるか否かを示すboolean型変数
 	 */
 	private boolean withinRange(int value, int min, int max) {
 		return (min <= value) && (value <= max);
 	}
-
-	// ☆
+	
 	/**
 	 * 2つの値が誤差を含めて等しいか否かを判定します。<br>
 	 * 
@@ -362,8 +364,7 @@ public class MyCircle {
 	private boolean isEqual(double a, double b) {
 		return Math.abs(a - b) < 10;
 	}
-
-	// ☆
+	
 	/**
 	 * 2つの値のうち、一方の値がもう一方の値より誤差を含めて大きいか否かを判定します。<br>
 	 * 

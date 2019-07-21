@@ -11,7 +11,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-//☆
 /**
  * 他クラスを統合的に扱って和算図形問題にタグ付けを行い、その結果を表示するクラスです。 <br>
  * Javaの標準クラスであるCanvasクラスをサブクラス化して利用します。
@@ -19,36 +18,31 @@ import javax.imageio.ImageIO;
  * @author Takuma Tsuchihashi
  */
 public class NewCanvas extends Canvas {
-
-	// ☆
+	
 	/**
 	 * 画像処理を利用するためのImageProcessingクラス変数です。<br>
 	 * この変数を用いることでImageProcessingクラス内のメソッドなどを呼び出すことができます。
 	 */
 	public ImageProcessing imgProc;
-
-	// ☆
+	
 	/**
 	 * Hough変換を利用するためのHoughTransformクラス変数です。<br>
 	 * この変数を用いることでHoughTransformクラス内のメソッドなどを呼び出すことができます。
 	 */
 	public HoughTransform houghTrans;
-
-	// ☆
+	
 	/**
 	 * 要素分析を利用するためのElementAnalysisクラス変数です。<br>
 	 * この変数を用いることでElementAnalysisクラス内のメソッドなどを呼び出すことができます。
 	 */
 	public ElementAnalysis elemAnal;
-
-	// ☆
+	
 	/**
 	 * タグ付けを利用するためのAutomaticTagクラス変数です。<br>
 	 * この変数を用いることでAutomaticTagクラス内のメソッドなどを呼び出すことができます。
 	 */
 	public AutomaticTag autoTag;
-
-	// ☆
+	
 	/**
 	 * 図形問題の画像ファイルパスを指定し、表示するキャンバス(NewCanvas)のインスタンスを生成するコンストラクタです。<br>
 	 * 
@@ -65,8 +59,7 @@ public class NewCanvas extends Canvas {
 		detectGraphicElement();
 		tagProblem();
 	}
-
-	// ☆
+	
 	/**
 	 * 自動タグ付けが完了した図形問題に関する不要なオブジェクトをメモリから解放します。<br>
 	 * 複数の図形問題に対して連続的に自動タグ付けを行う際、OutOfMemoryErrorを回避します。
@@ -77,8 +70,7 @@ public class NewCanvas extends Canvas {
 		elemAnal.freeResource();
 		autoTag.freeResource();
 	}
-
-	// ☆
+	
 	/**
 	 * Hough変換を利用して図形問題から幾何要素(点・線分・円)を抽出します。<br>
 	 * 幾何要素は円→線分→点の順に抽出されます。
@@ -97,14 +89,13 @@ public class NewCanvas extends Canvas {
 		// 以下、点の抽出です。
 		elemAnal.scanPoint();// Hough変換を利用して仮抽出された線分と円に基づき、図形問題から点を仮抽出します。
 	}
-
-	// ☆
+	
 	/**
 	 * 図形問題から抽出された幾何要素(点・線分・円)に基づいて、図形要素(n角形・円)を分析します。<br>
 	 * また、図形問題の元画像から、幾何要素を抽出した画像と文字要素を抽出した画像を生成します。
 	 */
 	private void detectGraphicElement() {
-		elemAnal.relateElement();
+		elemAnal.relateElement();// 図形問題から仮抽出された点や線分を補正し、互いに関連付けます。
 		elemAnal.detectElement();//
 
 		imgProc.clipImage(elemAnal.detectedLine, elemAnal.detectedCircle);// 図形問題に含まれる幾何要素、図形要素を抽出した画像および文字要素を抽出した画像を生成します。
@@ -121,8 +112,7 @@ public class NewCanvas extends Canvas {
 			System.exit(0);
 		}
 	}
-
-	// ☆
+	
 	/**
 	 * 図形問題から分析された図形要素(n角形・円)に基づいて、タグを付与します。<br>
 	 * また、図形問題に付与したタグから特徴ベクトルを生成します。
@@ -133,8 +123,7 @@ public class NewCanvas extends Canvas {
 
 		System.out.println("--------------------------------------------------");
 	}
-
-	// ☆
+	
 	/**
 	 * 図形問題に含まれる幾何要素(点・線分・円)の抽出結果をキャンバスに描画し、表示します。<br>
 	 * キャンバスの左側には幾何要素の抽出結果、右側には幾何要素の切り出し結果が表示されます。

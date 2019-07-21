@@ -1,15 +1,9 @@
 package wasan.problems;
 
-/**
- * 画像処理の中でもHough変換のみに特化したクラス
- */
-
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
@@ -144,7 +138,7 @@ public class HoughTransform {
 
 		houghLine = new ArrayList<MyLine>();
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -654,12 +648,8 @@ public class HoughTransform {
 									&& subsubArray[x] != subsubArray[x + 1] - 1) {
 								rIncr = subsubArray[x] - subsubArray[xIncr];
 								dxIncr = x - xIncr;
-								// System.out.println("xIncr, rIncr, dxIncr =
-								// "+xIncr+","+rIncr+","+dxIncr);
 								if ((rIncr > 6 && rIncr * 20 > dxIncr) || (rIncr > 4 && rIncr * 15 > dxIncr)) {// 断続的に増加している条件
 									countIncrDecr += dxIncr;
-									// System.out.println("OK: countIncrDecr =
-									// "+countIncrDecr);
 									for (int xx = xIncr; xx < x; xx++) {
 										sub5subArray[xx] = 1;
 									}
@@ -690,12 +680,8 @@ public class HoughTransform {
 									&& subsubArray[x] != subsubArray[x + 1] + 1) {
 								rDecr = subsubArray[xDecr] - subsubArray[x];
 								dxDecr = x - xDecr;
-								// System.out.println("xDecr, rDecr, dxDecr =
-								// "+xDecr+","+rDecr+","+dxDecr);
 								if ((rDecr > 6 && rDecr * 20 > dxDecr) || (rDecr > 4 && rDecr * 15 > dxDecr)) {// 断続的に減少している条件
 									countIncrDecr += dxDecr;
-									// System.out.println("OK: countIncrDecr =
-									// "+countIncrDecr);
 									for (int xx = xDecr; xx < x; xx++) {
 										sub5subArray[xx] = 1;
 									}
@@ -722,12 +708,8 @@ public class HoughTransform {
 					if (xIncr > 0) {
 						rIncr = subsubArray[x] - subsubArray[xIncr];
 						dxIncr = x - xIncr;
-						// System.out.println("xIncr, rIncr, dxIncr =
-						// "+xIncr+","+rIncr+","+dxIncr);
 						if ((rIncr > 6 && rIncr * 20 > dxIncr) || (rIncr > 4 && rIncr * 15 > dxIncr)) {// 断続的に増加している条件
 							countIncrDecr += dxIncr;
-							// System.out.println("OK: countIncrDecr =
-							// "+countIncrDecr);
 							for (int xx = xIncr; xx < x; xx++) {
 								sub5subArray[xx] = 1;
 							}
@@ -738,12 +720,8 @@ public class HoughTransform {
 					if (xDecr > 0) {
 						rDecr = subsubArray[xDecr] - subsubArray[x];
 						dxDecr = x - xDecr;
-						// System.out.println("xDecr, rDecr, dxDecr =
-						// "+xDecr+","+rDecr+","+dxDecr);
 						if ((rDecr > 6 && rDecr * 20 > dxDecr) || (rDecr > 4 && rDecr * 15 > dxDecr)) {// 断続的に増加している条件
 							countIncrDecr += dxDecr;
-							// System.out.println("OK: countIncrDecr =
-							// "+countIncrDecr);
 							for (int xx = xDecr; xx < x; xx++) {
 								sub5subArray[xx] = 1;
 							}
@@ -817,18 +795,11 @@ public class HoughTransform {
 
 		for (int x = 0; x < maxWidth; x += d) {
 			for (int y = 0; y < maxHeight; y += d) {
-				if ((imgProc.editingImg.getRGB(x, y) & 0xFF) < 128) {// (image.getRGB(x,
-																		// y) >>
-																		// 16 &
-																		// 0xFF)
-																		// < 128
+				if ((imgProc.editingImg.getRGB(x, y) & 0xFF) < 128) {
 					for (int cx = 0; cx < maxWidth; cx += d) {
 						for (int cy = 0; cy < maxHeight; cy += d) {
-							// double cr = radius[Math.abs(cx - x)][Math.abs(cy
-							// - y)];
 							int cr = (int) radius[Math.abs(cx - x)][Math.abs(cy - y)];
-							if (cr < maxRadius) {// maxRadius-1でもよし
-								// fieldCircle[cx][cy][(int) cr]++;
+							if (cr < maxRadius) {
 								fieldCircle[cx][cy][cr]++;
 							}
 						}
@@ -902,14 +873,43 @@ public class HoughTransform {
 		return new MyCircle(p, r);
 	}
 
+	// ☆
+	/**
+	 * 直線のHough変換における(θ,ρ)のパラメータが既定の範囲内に存在するか否かを判定します。<br>
+	 * 
+	 * @param theta
+	 *            (θ,ρ)のパラメータにおけるθを表すdouble型変数
+	 * @param rho
+	 *            (θ,ρ)のパラメータにおけるρを表すdouble型変数
+	 * @return (θ,ρ)のパラメータが既定の範囲内に存在するか否かを示すboolean型変数
+	 */
 	private boolean inRange(double theta, double rho) {
 		return (0 <= theta && theta < maxTheta) && (-maxRho <= rho && rho < maxRho);
 	}
 
+	// ☆
+	/**
+	 * 円のHough変換における(X,Y,R)のパラメータが既定の範囲内に存在するか否かを判定します。<br>
+	 * 
+	 * @param x
+	 *            (X,Y,R)のパラメータにおけるXを表すdouble型変数
+	 * @param y
+	 *            (X,Y,R)のパラメータにおけるYを表すdouble型変数
+	 * @param r
+	 *            (X,Y,R)のパラメータにおけるRを表すdouble型変数
+	 * @return (X,Y,R)のパラメータが既定の範囲内に存在するか否かを示すboolean型変数
+	 */
 	private boolean inRange(double x, double y, double r) {
 		return (0 <= x && x < maxWidth) && (0 <= y && y < maxHeight) && (0 < r && r < maxRadius);
 	}
 
+	// ☆
+	/**
+	 * 処理中に何らかの例外が発生した際、その詳細を表示します。<br>
+	 * 
+	 * @param e
+	 *            例外の内容を表すException型変数
+	 */
 	private void showException(Exception e) {
 		StackTraceElement[] ste = e.getStackTrace();
 		System.err.println("例外発生 : " + e.getClass().getName());
